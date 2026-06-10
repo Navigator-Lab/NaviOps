@@ -1,0 +1,45 @@
+# Secrets — never commit
+.secrets/
+**/.env
+.env.*
+.aws/
+*.pem
+*.ppk
+id_rsa*
+id_ed25519*
+*.key
+
+# Terraform (per github/gitignore Terraform.gitignore)
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Navi internal state
+.agent/state/active_project.json
+
+# Backups & archives
+_backup_*/
+.agent/_backup_*/
+
+# Node (future tooling)
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+
+# OS / editor
+.DS_Store
+*.log
