@@ -58,6 +58,40 @@ In a SysAdmin/DevOps context specifically:
 | "Two engineers updating the same Terraform file" | Branching + merge/PR workflow |
 | "Prove to auditors that no one touched the firewall rules" | Immutable commit history |
 
+### Three-Level Depth (Lens A)
+
+- **Level 1 — Beginner:** `git add` stages changes, `git commit` snapshots them,
+  `git log` shows history, `git branch`/`git checkout` switch lines of work.
+- **Level 2 — SysAdmin:** branching strategy (GitHub Flow), PRs/code review, branch
+  protection, resolving merge conflicts, `git bisect`/`git log -S` for incident
+  root-cause, GitOps (merging to `main` triggers infra apply).
+- **Level 3 — Systems (Lens D):** Git is a **content-addressable filesystem**. Every
+  blob, tree, and commit is stored under `.git/objects/<sha1[0:2]>/<sha1[2:]>`, named
+  by the **SHA-1 hash of its own (zlib-compressed) content**. A commit object is just a
+  pointer (hash) to a tree (snapshot of the directory) plus a pointer to its parent
+  commit(s) — that's why the "commit graph" diagram in Step 1 is literally a graph of
+  hash pointers, not a special data structure. `git cat-file -p HEAD` and
+  `git cat-file -p HEAD^{tree}` show this directly. Git itself is written in C; the
+  object format and hashing are why `git` operations are fast even on huge histories
+  (content is deduplicated by hash — identical file content across commits is stored
+  once).
+
+### Analogy (Lens B)
+
+Git is like a **video game's save-file system** crossed with a **photo album**:
+- Each **commit** is a save point — a complete snapshot you can always load again,
+  with a note (commit message) describing what happened since the last save.
+- A **branch** is a separate save slot forked from a save point — you can play out a
+  risky experiment in slot B without overwriting slot A (`main`).
+- **Merging** is combining progress from two save slots back into one.
+- A **Pull Request** is asking a teammate to review your save-file diff *before* it
+  becomes the new "official" save that everyone builds on.
+
+This analogy holds for the everyday workflow, but it breaks down for **merge
+conflicts** — two save files don't "conflict," but two sets of *line-by-line text
+changes to the same file* can, and resolving that requires understanding the diff, not
+just picking one save over the other.
+
 ---
 
 ## Step 2 — Real-World Use
@@ -154,6 +188,13 @@ most employers expect juniors to know.
 **Goal:** Run the complete professional Git workflow on the NaviOps repo itself —
 create a branch, make a real doc change, commit it with a proper message, and prepare
 it for a push to GitHub (the push is the human-approved step, not auto-run).
+
+**Lens C (Bash automation) note:** steps 4b/4f below (`git status`, `git log`,
+`git branch -a`, `git remote -v`) are exactly the manual checks a SysAdmin runs before
+touching a repo. `scripts/git-health-check.sh` (built in 4d) automates that check into
+one command — what a production engineer would wire into a pre-deploy CI step or a
+periodic repo-health report, instead of remembering to run 4 commands by hand every
+time.
 
 ### 4a — Configure your identity (one-time)
 

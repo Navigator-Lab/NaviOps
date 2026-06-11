@@ -66,21 +66,39 @@ Two goals reinforce each other:
 ## Gate Rule
 
 See `docs/learning/CLAUDE_TEACHING_RULES.md` — every lesson, command, script, or
-technology follows its 7 steps (Concept → Real-World Use → Alternatives → Hands-On Task
-→ Verification → Quiz → Reflection).
+technology follows its 8 steps (Concept → Real-World Use → Alternatives → Hands-On Task
+→ Verification → Quiz [graded with professional-answer comparisons] → Reflection →
+Search Keywords For Further Understanding).
 
 ## Technical Skills To Master
 
 | Area | Topics |
 |---|---|
 | Linux Administration | Filesystems, permissions, users/groups, processes, services, systemd, journald, cron, SSH, package management, storage, backups |
+| Git & GitHub | Core git (init/clone/add/commit/branch/merge/rebase/log/diff), remote workflows (push/pull/fetch/upstream/forks), GitHub collaboration (PRs, code review, issues, branch protection, commit conventions, tags/releases), GitHub Actions/CI basics, version-controlling scripts/configs/IaC as the audit trail (GitOps fundamentals) |
 | Bash | Variables, functions, loops, conditions, logging, error handling, automation, CLI tools |
 | Networking (CCNA-level) | OSI model, TCP/IP, subnetting, DNS, DHCP, NAT, routing, switching, VLANs, VPNs, firewalls, load balancing — always tied back to Linux administration |
-| Security | Linux hardening, SSH security, user auditing, log analysis, threat detection, security monitoring, least privilege, incident response |
-| Docker | Containers, images, networks, volumes, Compose, production deployment |
+| Security | Linux hardening, SSH security, user auditing, log analysis, threat detection, security monitoring, least privilege, secrets management, incident response |
+| Docker | Containers, images, networks, volumes, Compose, production deployment, basic orchestration concepts |
+| Configuration Management | Ansible basics (inventories, playbooks, roles) for repeatable Linux config — pairs with Git for GitOps-style change review |
+| CI/CD & IaC | GitHub Actions pipelines (lint/test/deploy), Terraform fundamentals (plan/apply, state) — introduced once Git/Docker/AWS basics are in place |
 | AWS | IAM, EC2, VPC, security groups, EBS, S3, CloudWatch, backups, monitoring — only what NaviOps needs |
 | Observability | Logs, metrics, monitoring, alerting, root cause analysis |
 | Documentation | Architecture notes, runbooks, operational docs, incident docs — using Navi's `docs/` standards |
+| Systems Programming (C) & Linux Internals | Not a standalone track — woven into Linux/networking/security lessons whenever the topic touches OS internals (processes, memory, file descriptors, signals, sockets, threads, syscalls, daemons). Small, focused C examples illustrate the kernel-level mechanism behind the sysadmin command (Lens D, `CLAUDE_TEACHING_RULES.md`) |
+
+> **2026-06-11 update (D10):** `01.md`'s Bash-first/C-aware, systems-thinking,
+> double-explanation, and learning-depth rules were merged into
+> `CLAUDE_TEACHING_RULES.md` as four **Integration Lenses** (A–D) applied within the
+> existing 8-step Gate Rule. C programming is taught *through* Linux internals (Lens
+> D), never as an isolated track — confirmed via WebSearch against established
+> systems-programming curricula (Harvard DCE, CU Boulder, man7.org/Kerrisk).
+
+> **2026-06-10 update (D5):** Git/GitHub, Ansible, GitHub Actions/CI, and Terraform/IaC
+> were added after WebSearch research confirmed these are baseline 2025-2026 junior
+> SysAdmin/DevOps expectations, not "advanced" extras. Git/GitHub is sequenced as
+> Lesson 02 — every lesson from here on should also produce a real commit to this repo,
+> turning version control into a running habit rather than a one-off topic.
 
 If a missing but important skill is identified mid-project, it gets added to this table
 and the roadmap (`LEARNING_STATE.md`) without waiting for permission — and the rationale
@@ -119,6 +137,8 @@ By the end of Phase 1, the operator should be able to:
 
 - [ ] Can administer users/groups/permissions, manage services with systemd, and read
       logs via journald without assistance.
+- [ ] Can use Git confidently (branch, commit, merge/rebase, resolve conflicts) and
+      run a GitHub PR-based workflow (open PR, review, merge, branch protection).
 - [ ] Can write a Bash script with argument handling, error handling, and logging.
 - [ ] Can explain OSI/TCP-IP basics, subnetting, and configure a basic firewall (e.g.
       `ufw`/`iptables`/security groups).
@@ -141,12 +161,14 @@ By the end of Phase 1, the operator should be able to:
 
 ## Monthly Milestones
 
-- **Month 1 (Days 1–30):** Linux fundamentals + Bash automation + basic networking +
-  Docker basics → Junior Linux SysAdmin DoD. NaviOps gains: health-check scripts, log
-  analysis tooling, first runbooks.
-- **Month 2+:** AWS (IAM/EC2/VPC/S3/CloudWatch) + Terraform + multi-service Docker
-  Compose + observability/alerting → progress toward Mid-Level DoD. NaviOps gains:
-  `infra/` (Terraform), monitoring stack, incident-response runbooks.
+- **Month 1 (Days 1–30):** Linux fundamentals + Git/GitHub fundamentals + Bash
+  automation + basic networking + Docker basics → Junior Linux SysAdmin DoD. NaviOps
+  gains: health-check scripts, log analysis tooling, first runbooks — all version
+  controlled with proper branch/PR hygiene from Lesson 02 onward.
+- **Month 2+:** Ansible + GitHub Actions CI basics + AWS (IAM/EC2/VPC/S3/CloudWatch) +
+  Terraform + multi-service Docker Compose + observability/alerting → progress toward
+  Mid-Level DoD. NaviOps gains: `infra/` (Ansible + Terraform), CI pipelines, monitoring
+  stack, incident-response runbooks.
 
 (Milestones are refined in `docs/learning/LEARNING_STATE.md` as the project progresses —
 this section states the *shape*, not a fixed locked schedule.)

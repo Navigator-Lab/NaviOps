@@ -20,23 +20,39 @@ Phase 1: Junior Linux SysAdmin in ~30 days (see `PROJECT_MISSION.md` Career Goal
 building NaviOps as the vehicle.
 
 ## Current Phase
-**Day 0 — Bootstrap.** Repo scaffolded (`.agent/`, `docs/`, pedagogy stack, gitignore,
-Gitleaks). No lessons completed yet.
+**Day 1 — Lesson 01 complete.** Repo scaffolded (`.agent/`, `docs/`, pedagogy stack,
+gitignore, Gitleaks). Lesson 01 (Linux filesystems & permissions) done end-to-end
+(Gate Rule Steps 1-8). Roadmap expanded with Git/GitHub + adjacent DevOps skill areas
+(D5) — Lesson 02 is Git & GitHub Fundamentals.
 
 ## Skills Already Learned
-_(none yet)_
+- Linux filesystems & permissions: rwx/octal notation, owner/group/other, `chmod`/
+  `chown`/`chgrp`, setuid (`passwd` example), SSH key permission requirements (`600`),
+  ACLs as the alternative for non-owner fine-grained access. (Lesson 01,
+  `docs/learning/lessons/01-linux-filesystems-permissions/README.md`)
 
 ## Skills Partially Learned
-_(none yet)_
+- Directory `r` vs `x` distinction (listing vs traversal/access) — answer in Lesson 01
+  quiz Q7 was directionally right but missed the precise split; flagged for spaced
+  review.
+- Recursive permission fixes (`chown -R`/`chmod -R` pitfalls, setgid for shared dirs,
+  when ACLs beat blanket `775`) — Lesson 01 quiz Q4 needs reinforcement.
+- `chown` vs `chgrp` root requirements — Q5 needs reinforcement (chgrp doesn't always
+  need root; chown does).
 
 ## Skills Not Started
-- Linux: filesystems, permissions, users/groups, processes, systemd, journald, cron, SSH, package management, storage, backups
+- Linux: users/groups, processes, systemd, journald, cron, SSH, package management, storage, backups
+- Git & GitHub: core git, branching/merging/rebasing, remote workflows, PR/code review, branch protection, GitHub Actions/CI basics, GitOps fundamentals
 - Bash: variables, functions, loops, conditions, logging, error handling, automation
 - Networking: OSI/TCP-IP, subnetting, DNS, DHCP, NAT, routing, switching, VLANs, VPNs, firewalls, load balancing
-- Security: hardening, SSH security, user auditing, log analysis, threat detection, incident response
-- Docker: containers, images, networks, volumes, Compose, production deployment
+- Security: hardening, SSH security, user auditing, log analysis, threat detection, secrets management, incident response
+- Docker: containers, images, networks, volumes, Compose, production deployment, basic orchestration
+- Configuration Management: Ansible (inventories, playbooks, roles)
+- CI/CD & IaC: GitHub Actions pipelines, Terraform fundamentals
 - AWS: IAM, EC2, VPC, security groups, EBS, S3, CloudWatch, backups, monitoring
 - Observability: logs, metrics, monitoring, alerting, RCA
+- C / Linux Internals (Lens D, woven into Linux/networking/security lessons):
+  processes, memory, file descriptors, signals, sockets, threads, syscalls, daemons
 
 ## Current Infrastructure
 _(none provisioned yet — placeholders only once it exists, e.g.)_
@@ -60,31 +76,48 @@ _(not started)_
 ## Current Docker Knowledge
 _(not started)_
 
+## Current C / Linux Internals Knowledge
+_(not started — Lens D introduced 2026-06-11 (D10); first concrete tie-in was Lesson
+01's `stat()`/`chmod()`/`open()` syscalls and `struct stat st_mode`)_
+
 ## Completed Projects
-_(none yet)_
+- **Lesson 01 — Linux Filesystems & Permissions**
+  (`docs/learning/lessons/01-linux-filesystems-permissions/README.md`) — full Gate Rule
+  (Steps 1-8), graded quiz with professional-answer comparisons, search keywords.
 
 ## Active Tasks
-- Choose and start Lesson 01 (Linux filesystems & permissions — recommended Day 1 per
-  `PROJECT_MISSION.md`).
+- Start Lesson 02 (Git & GitHub Fundamentals — see Next Lesson below).
+- Spaced-review the 3 partially-learned items from Lesson 01 (directory r/x split,
+  recursive chmod/setgid/ACL fix, chown/chgrp root requirements) during Lesson 02's
+  reflection.
 
 ## Blockers
 _(none)_
 
 ## Interview Readiness
-Not yet assessed — baseline to be set after Lesson 01.
+Baseline set after Lesson 01: can explain rwx/octal, ownership commands, setuid, ACLs
+at an interview standard for 5/8 areas; 3/8 need another pass (see Skills Partially
+Learned).
 
 ## Portfolio Readiness
-Not yet started — first artifact expected after Lesson 01.
+First artifact complete: Lesson 01 README is portfolio-worthy (Concept → Hands-On →
+Verification → Graded Quiz → Reflection → Search Keywords).
 
 ## Next Lesson
-**Lesson 01 — Linux Filesystems & Permissions** (proposed). Run through the full Gate
-Rule in `CLAUDE_TEACHING_RULES.md`; output to
-`docs/learning/lessons/01-linux-filesystems-permissions/README.md`.
+**Lesson 02 — Git & GitHub Fundamentals.** Added 2026-06-10 (D5) after WebSearch
+research showed Git/GitHub is a baseline junior SysAdmin/DevOps expectation, and the
+operator is already using git for this repo. Cover: core git commands (init/clone/
+add/commit/branch/log/diff), branching & merging, remote workflows (push/pull/fetch),
+and GitHub collaboration (PRs, code review, issues, branch protection). Run through
+the full 8-step Gate Rule; output to
+`docs/learning/lessons/02-git-github-fundamentals/README.md`. The hands-on task should
+use this NaviOps repo itself (e.g. create a branch, make a small doc change, open a PR)
+— first real "build NaviOps via Git" rep.
 
 ## Recommended Next Actions
-1. Confirm Lesson 01 topic with the operator (or accept the proposed default above).
-2. Run Lesson 01 through all 7 Gate Rule steps.
-3. Update this file (Update Protocol below) and `docs/STATUS.md`.
+1. Start Lesson 02 (Git & GitHub Fundamentals) per the above.
+2. During Lesson 02's reflection, spot-check the 3 partially-learned Lesson 01 items.
+3. Update this file (Update Protocol below) and `docs/STATUS.md` after Lesson 02.
 
 ---
 
