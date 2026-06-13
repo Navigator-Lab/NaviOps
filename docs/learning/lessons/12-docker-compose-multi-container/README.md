@@ -136,6 +136,22 @@ docker compose config            # validate and print the resolved config
 - When you only have one container with no dependencies — plain `docker run` (or
   a systemd unit wrapping it, Lesson 05) is simpler.
 
+### Interview Angle
+
+**Question:** "Your app container starts fine but immediately throws
+'connection refused' when it tries to reach Postgres. `depends_on` is set
+correctly. What's going on, and how do you fix it?"
+
+A junior answer says "the DB container isn't running" and stops — but `docker
+compose ps` shows it *is* running. The senior answer recognizes that
+`depends_on` alone only waits for the container to *start*, not for Postgres
+inside it to finish initializing and accept connections — "started" vs.
+"ready." The fix is a `healthcheck:` on the db service plus `condition:
+service_healthy` on the dependent service. A senior candidate also flags the
+related trap: hardcoding `localhost` instead of the service name, since each
+container has its own network namespace and `localhost` won't resolve to a
+sibling container.
+
 ---
 
 ## Step 3 — Alternatives

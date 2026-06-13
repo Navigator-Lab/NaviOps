@@ -146,6 +146,29 @@ transfers directly.
 | Spending too long on one task | Time runs out before easier tasks are attempted | Time-box practice attempts (Step 4) — skip and return if stuck |
 | Forgetting `restorecon`/`semanage` after manually moving files (SELinux context not inherited) | Service fails with "permission denied" despite correct Unix permissions | Always check `ls -Z` after moving files into service directories |
 
+### Interview Angle
+
+**Scenario:** "You move a custom web app's files into `/web/html` and
+configure Apache to serve from there. Permissions look correct
+(`644`, owned by `apache:apache`), but every request returns `403
+Forbidden`. Walk me through your diagnosis."
+
+A junior answer stops at "permissions are fine, so it must be a config
+issue" and starts re-reading the Apache config — missing the actual cause.
+A senior answer immediately suspects **SELinux context**, because this is
+the textbook RHCSA/RHEL failure signature: Unix permissions can be entirely
+correct while SELinux denies access based on a separate **context** label.
+They'd run `ls -Z /web/html` to confirm the directory has the wrong context
+(likely `default_t` instead of `httpd_sys_content_t`, since it's outside
+the default `/var/www/html`), use `audit2why` against `/var/log/audit/
+audit.log` to confirm SELinux is the blocker, then fix it **persistently**
+with `semanage fcontext -a -t httpd_sys_content_t '/web/html(/.*)?'`
+followed by `restorecon -Rv /web/html` — explaining why `chcon` alone is
+insufficient (it doesn't survive a relabel). This dual-permission-system
+mental model — Unix permissions AND SELinux context must both pass — is
+exactly what separates RHCSA-ready troubleshooting from Ubuntu/AppArmor-only
+experience.
+
 ---
 
 ## Step 3 — Alternatives

@@ -288,6 +288,7 @@ view_file .agent/protocols/ADR-P03-Verification.md
 
 | Protocol | P10 Support Role |
 |---|---|
+| **P12 (ENUM)** | Sibling fast-path: handles the deterministic-fix subset. Escalate ENUM → P10 the moment the root cause stops being obvious |
 | **P04 (Code Audit)** | Provides verified file content for Step 3 |
 | **P05 (Intelligence)** | Provides blast radius — what else might be affected |
 | **P06 (Command Standards)** | Ensures debug commands use correct paths/venv |

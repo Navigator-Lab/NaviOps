@@ -152,6 +152,21 @@ jobs:
   workflow that lints/validates your scripts and Dockerfiles (Step 4), and add
   stages as the project grows.
 
+### Interview Angle
+
+**Question:** "A PR from an external contributor adds a step that uses a
+third-party action pinned to `@v3`. What's your concern, and what would you
+change before approving?"
+
+A junior answer says "looks fine, it's a popular action." A senior answer
+flags that `@v3` is a mutable tag — the maintainer can push new code under that
+tag, so your CI silently runs different code tomorrow than it ran today; pin
+to a full commit SHA instead. They'd also check the `permissions:` block —
+if it's missing, the workflow gets default (potentially broad) token
+permissions, and a compromised action in that step could exfiltrate repo
+secrets. The senior framing treats third-party actions and CI permissions as
+**supply-chain attack surface**, not just "does the build pass."
+
 ---
 
 ## Step 3 — Alternatives

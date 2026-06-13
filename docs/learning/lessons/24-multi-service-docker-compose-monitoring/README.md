@@ -150,6 +150,25 @@ docker compose up -d --scale app=3
   lesson — real production scaling decisions depend on actual load testing,
   not "more replicas = better."
 
+### Interview Angle
+
+**Scenario:** "A teammate wants to add `ports: - '8081:8080'` to `app2` so
+they can curl it directly for debugging. What's your reaction?"
+
+A junior answer says "sure, that's convenient" or focuses only on "it
+works, so it's fine." A senior answer flags the network-segmentation
+tradeoff immediately: publishing a port on `app2` creates a second,
+unmonitored entry point that bypasses Traefik entirely — traffic to it
+skips load-balancing, health-check-driven routing, and any
+auth/TLS the proxy provides, and it's easy to forget to remove before
+shipping. The senior answer offers the safer alternative: `docker compose
+exec app2 sh` to get a shell on the container directly, or `docker compose
+logs app2` / `curl` from *within* the `proxy` or `backend` network (e.g.,
+via another container or a temporary debug container attached to the same
+network) — debugging access without widening the attack surface. This
+mirrors the `db`-on-`backend`-only principle: only the proxy should be
+internet-reachable, full stop.
+
 ---
 
 ## Step 3 — Alternatives

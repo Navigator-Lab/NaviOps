@@ -158,6 +158,22 @@ aws logs tail /var/log/naviops --follow
   auto-remediation are valuable to *understand* but not necessary to fully
   build out for a learning project.
 
+### Interview Angle
+
+**Scenario:** "Our team set up a CPU alarm at 80% with a 1-minute evaluation
+period. It now fires multiple times a day for transient spikes, and people
+have started ignoring the Slack channel. How do you fix this?"
+
+A junior answer says "raise the threshold to 95%" — a guess that papers over
+the real issue and might mask a genuine problem later. A senior answer
+diagnoses **alert fatigue** as the actual incident: pull ~2 weeks of
+`get-metric-statistics` history to see what "normal" actually looks like,
+then fix the alarm's `evaluation-periods` (e.g., require 3 consecutive
+5-minute breaches instead of 1) so transient spikes don't trigger it — and
+separately considers a **composite alarm** (CPU high AND request-count high)
+if the real signal is "CPU spikes that correlate with actual load." The
+distinction: junior tunes the number, senior tunes the *signal*.
+
 ---
 
 ## Step 3 — Alternatives

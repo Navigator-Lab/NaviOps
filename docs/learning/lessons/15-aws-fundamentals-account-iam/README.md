@@ -134,6 +134,23 @@ aws budgets describe-budgets --account-id <ACCOUNT_ID>
   yourself, not root), and roles for any resources you create, is sufficient
   for Lessons 15-20.
 
+### Interview Angle
+
+**Question:** "A developer asks you to give their app's EC2 instance
+`AdministratorAccess` so it can write to an S3 bucket, because 'it works and
+we're behind schedule.' How do you respond?"
+
+A junior answer either grants it to unblock the team or refuses without
+offering an alternative. A senior answer explains the blast-radius problem
+concretely — if that instance is compromised, the attacker now has total
+account control, not just S3 access — and proposes the actual fix: attach an
+IAM **role** to the instance (never embed access keys) scoped to a
+least-privilege policy covering only the specific bucket/actions needed
+(`s3:PutObject`, `s3:GetObject` on that ARN). Bonus points for mentioning
+`aws sts get-caller-identity` to verify which role the instance is actually
+running as, and for noting this should've had billing alerts configured
+*before* any resources existed.
+
 ---
 
 ## Step 3 — Alternatives

@@ -147,6 +147,23 @@ ssh -i ~/.ssh/my-ec2-key.pem ec2-user@<PUBLIC_IP>
   security group is fine — full three-tier VPC design matters once you have
   multiple interacting services (Lesson 24-25).
 
+### Interview Angle
+
+**Scenario:** "We launched an EC2 instance in a public subnet, security group
+allows port 22 from `0.0.0.0/0`, but our app server still can't reach the
+database in a private subnet. Walk me through your debugging."
+
+A junior answer jumps straight to "check the security group" and stops once
+inbound SSH looks fine — missing that the question is about app-to-DB
+traffic, not SSH. A senior answer works bottom-up: confirm the DB subnet's
+route table, then check whether the DB's security group allows inbound from
+the **app server's security group** (not just a CIDR — referencing a security
+group as the source is the AWS-specific detail juniors often don't know
+exists), then verify NACLs allow both directions (stateless — return traffic
+needs explicit rules), and separately flags the `0.0.0.0/0` SSH rule as a
+finding regardless of whether it's the root cause — because leaving it
+unaddressed is itself a problem.
+
 ---
 
 ## Step 3 — Alternatives

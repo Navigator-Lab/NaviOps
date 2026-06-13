@@ -140,6 +140,16 @@ live in Git. A SysAdmin's day looks like:
 - Real secrets — `.env`, `.pem` keys, `.tfvars` with real values — never, ever commit.
 - Frequently-changing database dumps — not meant for Git; use dedicated backup tools.
 
+### Interview Angle
+
+A common scenario question: *"You just pushed a commit and realized it contains an
+API key — what do you do, in order?"* The expected order is: **rotate the leaked
+credential first** (the key is compromised the moment it's pushed, history rewrite
+doesn't undo that), *then* remove it from history (`git filter-repo` / BFG) and
+force-push, *then* add it to `.gitignore` + a pre-commit secret scanner (Gitleaks —
+already in this repo) to prevent recurrence. Getting the **order** right (rotate
+before rewrite) is what separates a junior answer from a senior one.
+
 ---
 
 ## Step 3 — Alternatives

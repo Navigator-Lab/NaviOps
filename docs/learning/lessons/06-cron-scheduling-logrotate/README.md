@@ -121,6 +121,22 @@ logrotate -d /etc/logrotate.conf # dry-run (debug mode), shows what WOULD happen
 - Tasks with complex dependencies on other jobs — that's a workflow orchestrator
   (beyond this lesson's scope) or systemd unit dependencies.
 
+### Interview Angle
+
+**Question:** "A teammate added `*/5 * * * * /scripts/sync.py` to `/etc/cron.d/sync`
+and it never runs, even though `./sync.py` works fine when they SSH in and run it
+manually. Walk me through how you'd debug this."
+
+A junior answer jumps straight to "check the syntax" or re-types the cron line. A
+senior answer works the layers: first, `/etc/cron.d/` entries need an explicit
+**user field** (`*/5 * * * * root /scripts/sync.py`) — missing it is the #1 cause of
+"silently does nothing." Second, cron's environment is minimal — no `$PATH`, no
+shell profile — so `python3` (relying on `$PATH`) fails where `/usr/bin/python3`
+wouldn't; the senior checks `which python3` and hardcodes the absolute path. Third,
+they add `>> /var/log/sync.log 2>&1` immediately, because without redirection any
+error is invisible — cron mails it to a local mailbox nobody reads. The senior
+treats "no output" as a debugging dead-end to eliminate first, not a mystery.
+
 ---
 
 ## Step 3 — Alternatives

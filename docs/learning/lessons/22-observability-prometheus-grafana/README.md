@@ -160,6 +160,25 @@ curl -s 'http://localhost:9090/api/v1/query?query=node_filesystem_avail_bytes' |
   multi-target federation matter once you have multiple servers/services
   (Lesson 24-25).
 
+### Interview Angle
+
+**Scenario:** "Our Grafana dashboard shows a graph for
+`http_requests_total` that only ever climbs, even during quiet periods —
+the on-call engineer can't tell if traffic is actually increasing right
+now. Walk me through what's wrong and how you'd fix it."
+
+A junior answer identifies the symptom — "the graph is wrong" — and maybe
+suggests restarting Grafana or re-checking the data source. A senior
+answer immediately names the root cause: `http_requests_total` is a
+**Counter** (monotonically increasing), and the panel is plotting the raw
+counter instead of its rate of change. The fix is wrapping it in
+`rate(http_requests_total[5m])` — a senior candidate explains *why*
+`rate()` is needed (counters reset on restart, so raw values are
+meaningless for "current load"), why a 5m window is a reasonable default
+(smooths noise without hiding real trends), and connects it to the broader
+principle: every Counter metric in PromQL needs `rate()` or `irate()`
+before it's human-readable.
+
 ---
 
 ## Step 3 — Alternatives

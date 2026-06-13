@@ -128,6 +128,22 @@ traceroute <ip>             # which hops/routers does traffic pass through?
   everything is fine. Subnetting design matters when you have **multiple network
   segments** (production VPC design, Lesson 16).
 
+### Interview Angle
+
+**Question:** "You're handed `10.0.0.0/22` and asked to carve it into 4 equal
+subnets for a new environment. What size do you give each, and how do you verify a
+host's IP actually belongs to one of them?"
+
+A junior answer might guess "/24 each" without checking the math, or stop at "here's
+the subnet, done." A senior answer starts from `/22` = 1024 addresses (2^(32-22)),
+splits into 4 equal blocks by borrowing 2 more bits → four `/24`s (256 addresses
+each, 254 usable after subtracting network/broadcast), and states each block's
+range explicitly (`10.0.0.0/24`, `10.0.1.0/24`, etc.). For verification, they don't
+eyeball it — they reach for `ip addr show` to confirm the assigned CIDR and
+`ip route show` to confirm the host's default gateway sits inside the same subnet,
+catching the classic misconfiguration where an IP and gateway are on different
+networks and the host silently can't route.
+
 ---
 
 ## Step 3 — Alternatives

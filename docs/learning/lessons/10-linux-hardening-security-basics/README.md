@@ -154,6 +154,24 @@ systemctl list-unit-files --state=enabled
   legitimate application functionality (a very common "why did my app suddenly stop
   working after a security update" cause).
 
+### Interview Angle
+
+**Question:** "After a routine SELinux enforcing rollout, a web app starts returning
+500 errors when writing to its log directory — `ls -l` shows the permissions are
+correct and the app's Unix user owns the directory. What's going on, and how do you
+fix it without disabling SELinux?"
+
+A junior answer either says "disable SELinux, the permissions are fine" or stops at
+`setenforce 0` as the fix. A senior answer recognizes this as the textbook DAC-vs-MAC
+split from Lesson 04/10: Unix permissions (DAC) say the write is allowed, but
+SELinux's LSM hook is a second, independent check on the file's **security
+context** — the log directory likely has the wrong label (not
+`httpd_sys_rw_content_t` or similar). The senior runs `ausearch -m avc -ts recent`
+to confirm a denial was logged, then either relabels the directory
+(`restorecon -Rv`) or, if the access is legitimate but unmodeled, generates a
+targeted policy module with `audit2allow` — never a blanket `setenforce 0`, which
+removes the whole defense layer.
+
 ---
 
 ## Step 3 — Alternatives
@@ -218,6 +236,10 @@ server" script that proves you can assess a system's security posture quickly.
 5. Write `scripts/hardening_audit.sh` per the structure above.
 6. Document your before/after findings in the lesson's Reflection (Step 7).
 7. Commit on `lesson/10-linux-hardening-security-basics`.
+
+### Optional: failure drills
+
+When you're ready for timed challenges, try [`troubleshooting-drills.md` §1 (SELinux denial / .autorelabel trap)](../../troubleshooting-drills.md#1-selinux-denial--autorelabel-trap) in your sandbox VM.
 
 ---
 

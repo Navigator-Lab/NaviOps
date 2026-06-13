@@ -140,6 +140,21 @@ docker system prune                  # clean up unused images/containers (carefu
 - When the overhead of learning Docker isn't justified for a single, simple,
   long-lived script — though even then, containerizing it ensures reproducibility.
 
+### Interview Angle
+
+**Question:** "A container keeps restarting in a crash loop. Walk me through how
+you'd debug it, and what's wrong with this Dockerfile if `COPY . .` comes before
+`RUN npm install`?"
+
+A junior answer stops at `docker logs <name>` and maybe `docker ps -a` to confirm
+the restart count. A senior answer chains `docker inspect <name>` to check
+`State.ExitCode` and `OOMKilled` (is it crashing or getting killed for memory?),
+correlates with `docker run --memory=` limits, and on the Dockerfile question
+explains *why* `COPY . .` before `npm install` breaks layer caching — every
+source change invalidates the dependency-install layer, turning a 2-second
+rebuild into a 2-minute one. Senior candidates connect symptoms to root cause
+across the build *and* runtime lifecycle, not just one command.
+
 ---
 
 ## Step 3 — Alternatives

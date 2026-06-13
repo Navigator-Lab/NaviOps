@@ -170,6 +170,23 @@ echo "show stat" | sudo socat stdio /run/haproxy/admin.sock   # live backend sta
   from Lesson 16). Load balancing matters once you have **2+ instances of the
   same service** (Lesson 24).
 
+### Interview Angle
+
+**Scenario:** "We set up WireGuard so admins can SSH to `10.10.0.1` over the
+tunnel. Should we remove the old security group rule allowing SSH from our
+office's public IP, keep both, or something else?"
+
+A junior answer says "keep both, just in case" — leaving the broader,
+internet-facing rule active defeats the purpose of adding the VPN. A senior
+answer applies Lesson 16's least-privilege principle directly: restrict the
+security group's SSH rule to `10.10.0.0/24` (the WireGuard subnet) only, and
+remove the public-IP rule entirely — SSH now requires both `wg-quick up wg0`
+and a valid WireGuard key, collapsing "my IP changed, edit the security group
+again" into a non-issue. They'd also note the tradeoff: if WireGuard goes
+down, there's no SSH fallback — which is the *correct* tradeoff, since a
+fallback path defeats the segmentation, and WireGuard's own reliability
+(systemd unit, `wg show` monitoring) becomes the thing to harden instead.
+
 ---
 
 ## Step 3 — Alternatives

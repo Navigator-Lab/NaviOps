@@ -139,6 +139,22 @@ ansible-vault encrypt group_vars/all/secrets.yml            # encrypt secrets
 - Managing Windows-heavy environments exclusively — possible (WinRM) but
   Ansible's strongest fit is Linux/Unix via SSH.
 
+### Interview Angle
+
+**Question:** "You need to roll out a security patch across 50 servers tonight.
+How do you make sure it doesn't break production, and how do you know the
+playbook is actually idempotent?"
+
+A junior answer jumps straight to `ansible-playbook site.yml -m apt -a
+"upgrade=dist"` against all hosts. A senior answer leads with `--check --diff`
+first to preview changes without applying them, runs against a small `-l`
+subset before the full fleet, and explains idempotency concretely: running the
+playbook twice should report `changed=0` the second time. They'd also flag
+that `shell`/`command` modules break this guarantee — every run shows
+`changed`, so proper modules (`apt`, `service`, `lineinfile`) are required for
+`--check` mode to mean anything. The senior framing is "prove nothing changes
+on a re-run," not "did the command succeed."
+
 ---
 
 ## Step 3 — Alternatives

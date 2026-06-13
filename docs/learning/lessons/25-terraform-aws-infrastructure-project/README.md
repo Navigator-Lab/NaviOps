@@ -165,6 +165,26 @@ terraform output app_url
   individual resource (e.g., a module that's just one `aws_security_group` —
   that's premature abstraction, Lesson 03 Q3/Lesson 20 Q6 again).
 
+### Interview Angle
+
+**Scenario:** "Your `user_data` script installs Docker, configures
+firewall rules, hardens SSH, sets up log rotation, and deploys the app —
+all in one 200-line bash script run at boot. What's your concern with this
+design?"
+
+A junior answer says "it works at boot, so it's fine" or focuses on script
+readability alone. A senior answer identifies the architectural problem:
+`user_data`/cloud-init runs **once, at first boot, as root**, with no easy
+re-run, no idempotency guarantees, and no drift detection — anything beyond
+minimal bootstrapping (install Docker, clone the repo, `docker compose up`)
+belongs in a configuration-management tool like Ansible (Lesson 13) that
+can be re-applied safely. The senior answer also connects this to the IAM
+instance profile pattern in `modules/compute`: `user_data` should never
+need embedded AWS credentials because the instance profile already grants
+the EC2 instance scoped, temporary permissions — and explains why "Terraform
+provisions, Ansible configures" is the maintainable split, not "Terraform
+provisions and fully configures via user_data."
+
 ---
 
 ## Step 3 — Alternatives

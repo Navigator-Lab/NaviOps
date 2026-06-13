@@ -124,6 +124,21 @@ systemd-analyze verify /etc/systemd/system/myapp.service   # validate before rel
 - Tasks that should run **on a schedule, then exit** — that's a **timer unit** (or
   cron, Lesson 06), not a long-running service.
 
+### Interview Angle
+
+**Question:** "You deploy a config change to a service's unit file and run
+`systemctl restart myapp`, but the service comes back up with the *old* behavior —
+like the change was never applied. What's going on, and how do you fix it?"
+
+A **junior** answer might re-edit the file, double-check for typos, or restart again
+and hope. A **senior** answer immediately suspects a missed `systemctl daemon-reload`
+— systemd caches unit file definitions in memory, so editing the file on disk doesn't
+change what systemd is currently running until it's told to reread unit files. The fix
+is `sudo systemctl daemon-reload && sudo systemctl restart myapp`. The senior also
+validates the edited unit *before* reloading with `systemd-analyze verify`, to catch
+a typo like `ExectStart` that would otherwise cause a confusing "still old behavior"
+or silent failure.
+
 ---
 
 ## Step 3 — Alternatives
@@ -186,6 +201,10 @@ journalctl -u naviops-audit.service
 timestamped, queryable by time range — instead of scattered `/tmp` files. This is the
 foundation for Lesson 06 (turning this into a scheduled timer) and Lesson 18
 (CloudWatch — the cloud equivalent of "centralize logs").
+
+### Optional: failure drill
+
+When you're ready for a timed challenge, try [`troubleshooting-drills.md` §5 (Failed systemd service)](../../troubleshooting-drills.md#5-failed-systemd-service) in your sandbox VM.
 
 ### What to build, step by step
 

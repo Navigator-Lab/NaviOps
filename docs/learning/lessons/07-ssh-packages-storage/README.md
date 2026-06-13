@@ -144,6 +144,23 @@ sudo pvs && sudo vgs && sudo lvs   # LVM layers, if in use
   lab VMs (per `naviops-strategy`) are a reasonable place to practice LVM precisely
   *because* they're disposable.
 
+### Interview Angle
+
+**Question:** "You're about to set `PasswordAuthentication no` and
+`PermitRootLogin no` on a remote server you can only reach via SSH. What's your
+exact procedure, and what could still go wrong even if you follow it?"
+
+A junior answer lists the config changes and maybe mentions `sshd -t`. A senior
+answer sequences it as a safety chain: confirm key-based login works for a non-root
+user *first*, in a way that doesn't depend on the change being tested (`ssh-copy-id`,
+then a real login from a fresh session); edit `sshd_config`; run `sudo sshd -t` to
+catch syntax errors before reload; `systemctl restart sshd` while keeping the
+*original* session open; then open a **brand-new** session to confirm login still
+works before closing the original. The senior also flags the residual risk: a
+`fail2ban` rule or firewall change applied around the same time can still lock you
+out even if `sshd_config` itself is correct — which is why changes are made one at a
+time, verified independently.
+
 ---
 
 ## Step 3 — Alternatives
@@ -220,6 +237,10 @@ into Lesson 06's cron/timer.
 4. Write `scripts/disk_report.sh` per the structure above.
 5. Commit `scripts/disk_report.sh` (and SSH/LVM notes — **redacted**, no real
    IPs/hostnames) on `lesson/07-ssh-packages-storage`.
+
+### Optional: failure drills
+
+When you're ready for timed challenges, try [`troubleshooting-drills.md` §2 (Broken /etc/fstab entry)](../../troubleshooting-drills.md#2-broken-etcfstab-entry), [§3 (Locked out by SSH config)](../../troubleshooting-drills.md#3-locked-out-by-ssh-config), and [§6 (Full disk)](../../troubleshooting-drills.md#6-full-disk) in your sandbox VM.
 
 ---
 

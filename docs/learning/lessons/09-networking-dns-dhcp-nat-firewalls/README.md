@@ -146,6 +146,21 @@ sysctl net.ipv4.ip_forward          # is this host allowed to route/forward pack
   for *other* devices on that network. Practice DHCP concepts via reading/`dig`/
   `/etc/resolv.conf` inspection unless in an isolated lab network.
 
+### Interview Angle
+
+**Question:** "A user says `https://internal-app.company.com` times out, but
+`ping internal-app.company.com` works fine. What's your diagnosis path?"
+
+A junior answer treats "ping works" as "network is fine" and starts looking at the
+app code first. A senior answer recognizes the layer mismatch immediately: ICMP
+(ping, Layer 3) and HTTPS (TCP/443, Layer 4+) are different protocols, and a
+firewall can allow one while blocking the other. They'd run `dig +short
+internal-app.company.com` to confirm DNS resolves to the expected IP, then
+`nc -zv <ip> 443` or `curl -v https://internal-app.company.com` to test the actual
+port. If `nc` hangs, the next step is `sudo ufw status verbose` (or `iptables -L -n`)
+on the target host to check for a `deny` rule on 443 — possibly one added during a
+recent hardening pass that forgot to allow the app's port before enabling.
+
 ---
 
 ## Step 3 — Alternatives
@@ -204,6 +219,10 @@ real security-audit deliverable (foreshadows Lesson 23).
    servers).
 4. Write `scripts/firewall_audit.sh` per the structure above.
 5. Commit on `lesson/09-networking-dns-dhcp-nat-firewalls`.
+
+### Optional: failure drills
+
+When you're ready for timed challenges, try [`troubleshooting-drills.md` §7 (Firewall blocking a service)](../../troubleshooting-drills.md#7-firewall-blocking-a-service) in your sandbox VM.
 
 ---
 

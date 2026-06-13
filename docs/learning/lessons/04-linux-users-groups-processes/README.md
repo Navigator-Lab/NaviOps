@@ -127,6 +127,21 @@ kill -9 <pid>     # SIGKILL — force, only if SIGTERM didn't work
 - Don't `kill -9` a process touching a database or writing a file mid-transaction
   unless SIGTERM has genuinely failed — risk of data corruption.
 
+### Interview Angle
+
+**Question:** "A teammate ran `usermod -G docker alice` to give Alice Docker access.
+The next day, Alice can't SSH in normally, and several of her cron jobs are failing.
+What happened, and how do you fix it without making things worse?"
+
+A **junior** answer might just re-add the missing groups one by one from memory. A
+**senior** answer first diagnoses: `usermod -G` (no `-a`) **replaces** the entire group
+list, so Alice likely lost `sudo`, `adm`, or whatever groups her cron jobs and SSH
+session depended on (e.g., group-owned key directories, log access). The senior fixes
+it by checking `/etc/group` (or a backup of it, or `last`/audit logs) to recover the
+*original* membership list, then runs `usermod -aG <original-groups> alice` — the `-a`
+is the actual fix, and the senior explains *why* `-aG` should be the default habit
+going forward, not just patches this one instance.
+
 ---
 
 ## Step 3 — Alternatives
@@ -228,6 +243,10 @@ int main(void) {
 This is the exact mechanism behind the `Z` state from Step 1 — the child's exit
 status sits in the kernel's process table until `wait()` (or the parent itself exits,
 at which point `init`/PID 1 adopts and reaps it).
+
+### Optional: failure drill
+
+When you're ready for a timed challenge, try [`troubleshooting-drills.md` §4 (Broken sudo access)](../../troubleshooting-drills.md#4-broken-sudo-access) in your sandbox VM.
 
 ---
 

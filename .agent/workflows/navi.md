@@ -45,7 +45,7 @@ where `project_law` = path to the project's `CLAUDE.md` / `AGENTS.md` / `navi.pr
 
 Emit the boot line (shows **what mode you're in**, the **tier** chosen + why, and the protocols loaded):
 `🧭 Navi v28 | project=<name|none> | stack=<…|none> | mode=<INTENT> | tier=<Lite|Standard|Enterprise> (<why>) | protocols=<P0x+P0y>`
-- `mode` = the detected intent (EXPLAIN · RESEARCH · PLAN · BUILD · DEBUG · VERIFY · REVIEW · REFACTOR · OPERATE).
+- `mode` = the detected intent (EXPLAIN · RESEARCH · PLAN · BUILD · DEBUG · ENUM · VERIFY · REVIEW · REFACTOR · OPERATE).
 - `tier` = the operating tier chosen by §3, with the deciding signal in parentheses — that clause *is* the "recommend + why" (e.g. `tier=Standard (multi-file, reversible, no danger zone)`, `tier=Enterprise (PHI/migration — forced floor)`, `tier=Lite (single-file fast-path)`). On ambiguity emit `tier=? (<reason>)` then ask one question.
 - `protocols` = the protocol files actually loaded for that intent (e.g. `P02+P10` for DEBUG; `P01+P04+P07` for BUILD).
 - At pure boot (intent not yet known) emit `mode=BOOT | tier=? | protocols=P00`, then re-emit once intent + tier are resolved (§1, §3).
@@ -60,11 +60,14 @@ Detect intent from plain language. **Score confidence**; if `<0.7` or 2+ intents
 | RESEARCH | research, compare, best practice, find options, what's the right way | EXP (+web) | P02 |
 | PLAN | plan, design the steps, how would we, lay it out | PLAN | P01 (needs EXP) |
 | BUILD | build, implement, write the code, make it, add | PLAN→exec | P01 (+P04) |
-| DEBUG | bug, error, crash, failing, broken, why doesn't X | EXP | P02+P10 |
+| ENUM | a terminal error/typo/setting with a **known, deterministic, copy-paste fix** | incident card | P12 |
+| DEBUG | bug, error, crash, failing, broken, why doesn't X (**unknown** root cause) | EXP | P02+P10 |
 | VERIFY | verify, validate, check, run the tests, does it work | EXP | P02+P03 |
 | REVIEW | review, audit, is this good, simplify, overengineered | EXP | P04+P07+karpathy |
 | REFACTOR | refactor, clean up, restructure, de-dupe | PLAN | P01+P07 |
 | OPERATE | run, start, deploy, ship, release, set up | guided cmds | P06 (+P09) |
+
+**ENUM vs DEBUG discriminator**: a terminal error with a *known, deterministic* fix (typo, wrong flag, missing path, unset var, bad permission) → **ENUM** (Lite card, `P12`). An error whose root cause is *unknown* and needs hypothesis-testing → **DEBUG** (`P02+P10`). If unsure, it's DEBUG. ENUM is the formalized fast-path (§3), not a parallel system — see `ADR-P12-ENUM.md` for the card contract.
 
 Project-specific signals (frameworks, danger zones) come from the detected **project_law**, not from this table.
 
@@ -114,6 +117,8 @@ Clearer specs beat longer prompts. Use XML/Markdown delimiters for any multi-par
 
 **Fast-path** (low-risk override): a single-file, reversible change with an obvious fix may skip the EXP→PLAN ceremony — state the change, make it (with backup), show the verify, report inline. Reserve full EXP→PLAN for risky / multi-file / irreversible work. *(Matches the user's standing "execute directly" preference.)*
 
+**ENUM** → read `P12`; the fast-path specialized to **terminal incidents with a deterministic fix**. Always Lite, no WebSearch, no EXP phases. Output is a 5-section incident card at `docs/reports/enum/ENUM_[DATE]_[slug].md` + one INDEX.md row — not an EXP/PLAN. Escalate to DEBUG (`P02+P10`) the moment the root cause stops being obvious.
+
 **VERIFY** → `P02`+`P03`. Two tiers: **Tier-0** (lightweight) runs **automatically after every BUILD** — the
 project's quick gate (`tsc`/`build`/`scan`, or `test_cmd`). **Tier-1** (full P03: tests + security + Definition of
 Done) is **auto-suggested** after behavioral / backend / PHI changes and is **required before any deploy**. Navi
@@ -143,7 +148,7 @@ Drop a `navi.project.md` in the project root containing: stack, build/test/run c
 
 ## 6. Skill Library (lazy-load)
 
-Generic engineering protocols (project-agnostic): `P00` anchor · `P01` PLAN · `P02` EXP · `P03` VERIFY · `P04` code-audit · `P05` blast-radius · `P06` command-safety · `P07` quality/Karpathy · `P10` debugger · `P13` dependency-map · `P14` adaptive-improvement · `karpathy` (`.claude/commands/karpathy.md`).
+Generic engineering protocols (project-agnostic): `P00` anchor · `P01` PLAN · `P02` EXP · `P03` VERIFY · `P04` code-audit · `P05` blast-radius · `P06` command-safety · `P07` quality/Karpathy · `P10` debugger · `P12` ENUM (incident card) · `P13` dependency-map · `P14` adaptive-improvement · `karpathy` (`.claude/commands/karpathy.md`).
 Deferred in `.agent/protocols/_deferred_domain/` (domain-specific — genericize before shipping in a release): `P08` frontend-UX · `P09` performance/observability.
 Archived in `.agent/protocols/_archive/`: predecessor project-specific protocols — restore only if such a project returns.
 

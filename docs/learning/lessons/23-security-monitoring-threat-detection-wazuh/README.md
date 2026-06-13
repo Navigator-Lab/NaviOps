@@ -156,6 +156,25 @@ curl -k -u <user>:<pass> "https://<MANAGER_IP>:55000/security/user/authenticate"
   high-availability Wazuh deployments are enterprise-scale concerns beyond
   this lesson's scope.
 
+### Interview Angle
+
+**Scenario:** "We deployed Wazuh six months ago with the default ruleset.
+The dashboard now shows 800+ alerts per day and the on-call team has
+stopped looking at it. How would you fix this?"
+
+A junior answer focuses on the surface fix — "turn off some rules" or "add
+more people to watch the dashboard." A senior answer recognizes this as
+**alert fatigue** (the same failure mode as un-tuned CloudWatch alarms or
+PromQL alerts without a `for` duration) and treats it as a tuning problem,
+not a staffing problem: triage which rule IDs generate the bulk of volume,
+determine if they're false positives or genuinely low-severity noise for
+this environment, and either disable/adjust thresholds for rules that don't
+apply (e.g., FIM on a path that legitimately changes often) or re-route
+low-severity alerts to a non-paging channel. Critically, a senior candidate
+ties this back to FIM scope discipline — alerting on all of `/` instead of
+`/etc` and `/usr/bin` is a common root cause — and connects unreviewed
+alerts to Lesson 19's "detection without response" failure mode.
+
 ---
 
 ## Step 3 — Alternatives

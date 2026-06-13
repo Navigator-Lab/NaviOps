@@ -192,8 +192,16 @@ Track all pending improvements:
 | --- | ------------------------------------ | ---------- | ------------------ | ----------- | ------- |
 | 1   | Agent reads code from memory         | P10 Debug  | P04 Code Audit     | 🔴 Critical | Done    |
 | 2   | Missing pagination on list endpoints | P03 VERIFY | P07 Quality        | 🟡 High     | Pending |
-| 3   | No replay protection on webhooks     | P12 Review | P12 Reverse Edge   | 🔴 Critical | Pending |
+| 3   | Recurring terminal incident pattern  | P12 ENUM   | project_law / P07  | 🔴 Critical | Pending |
 ```
+
+---
+
+## 📋 Live Improvement Backlog
+
+| #   | Pattern                                                              | Source        | Protocol Updated | Priority    | Status |
+| --- | ------------------------------------------------------------------- | ------------- | ---------------- | ----------- | ------ |
+| 1   | ENUM mode printed boot line then **executed** the user's command (a `mv`) instead of writing the report-only incident card. Type: Routing/Compliance Error + Anti-Pattern. Root cause: P12 forbade EXP/WebSearch/escalation but never forbade execution → base-model action-bias won; "declaring `mode=ENUM`" did not "constrain tool use". | User report (2026-06-13) | **P12 v1.1** — REPORT-ONLY guardrail (contract `<rule>` + Rule 0) | 🔴 Critical | Done |
 
 ---
 

@@ -148,6 +148,25 @@ docker compose ps                                            # health status
   depth of analysis matters more than breadth of scenarios for a learning
   capstone.
 
+### Interview Angle
+
+**Scenario:** "You run `docker kill -s SIGKILL app1` expecting Traefik to
+fail over within 30 seconds, but it takes 45. The site never returned an
+error. Was this experiment a failure?"
+
+A junior answer says "yes, the hypothesis was wrong, so the experiment
+failed" — treating a missed SLO as a bad outcome. A senior answer reframes
+it: the experiment **succeeded** precisely because it surfaced a real gap
+between assumed and actual detection time — that's the entire point of
+chaos engineering. The senior response walks the next steps: document the
+45s figure as the actual baseline, investigate *why* it's slower than
+expected (health-check `interval`/`retries` settings in `compose.yaml`,
+Lesson 21), decide whether 45s is acceptable for this service or needs
+tuning, and update the runbook (`service-down.md`) with the measured
+number instead of the assumed one. They'd also note that zero user-facing
+errors during the 45s is itself a valuable finding — Traefik queued/retried
+correctly even while detection lagged.
+
 ---
 
 ## Step 3 — Alternatives

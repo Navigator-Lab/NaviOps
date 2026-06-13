@@ -160,6 +160,23 @@ terraform output                     # show output values (e.g., instance public
   modules become valuable once you're repeating the same VPC/EC2 pattern
   across multiple environments (Lesson 25).
 
+### Interview Angle
+
+**Scenario:** "A teammate manually deleted a security group rule in the AWS
+console that Terraform created. The next morning, someone runs `terraform
+plan`. What does it show, and how do you resolve it?"
+
+A junior answer says "Terraform will just fix it automatically" — wrong;
+`plan` only shows a diff, it doesn't act. A senior answer explains that
+`terraform plan` refreshes state against real infrastructure, detects the
+**drift** (the `.tf` file still declares the rule, but it no longer exists in
+AWS), and shows it as a pending **add**. Resolution is a judgment call: if the
+manual deletion was a mistake, `terraform apply` recreates the rule per the
+`.tf` file (source of truth wins); if the deletion was intentional, update the
+`.tf` to match (or `terraform import`/`refresh`) rather than let `apply` keep
+fighting the manual change. The senior framing is "drift is a signal to
+investigate, not something to blindly apply away."
+
 ---
 
 ## Step 3 — Alternatives

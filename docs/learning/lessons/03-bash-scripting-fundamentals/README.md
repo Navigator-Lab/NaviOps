@@ -135,6 +135,21 @@ IFS=$'\n\t'
   logic) — Bash *can* do it, but readability collapses fast. Bash shines as **glue**
   between other commands, not as a general-purpose language.
 
+### Interview Angle
+
+**Question:** "We had a cron job that ran a cleanup script every night. One night it
+deleted way more than expected. The script started with `cd $BACKUP_DIR && rm -rf *`.
+Walk me through what could have gone wrong and how you'd prevent it."
+
+A **junior** answer stops at "they should have quoted the variable" — true, but
+incomplete. A **senior** answer covers the full chain: if `$BACKUP_DIR` is unset (no
+`set -u`) and unquoted, `cd $BACKUP_DIR` silently fails or `cd`s to `$HOME`, then `&&`
+still runs `rm -rf *` in whatever directory the shell landed in — because there's no
+`set -e` to stop after the `cd` failure, and no `cd "$BACKUP_DIR" || exit 1` check.
+The senior fix is the full header (`set -euo pipefail`, `IFS=$'\n\t'`), explicit
+quoting, and explicit failure handling on `cd` — not just one isolated fix, but
+recognizing this as a *class* of defensive-scripting gap.
+
 ---
 
 ## Step 3 — Alternatives

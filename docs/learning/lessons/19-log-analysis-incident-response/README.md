@@ -156,6 +156,23 @@ aws logs start-query --log-group-name /naviops/app \
   real impact (per your team's severity definitions) or **recurring** minor
   issues (the 3rd time the same thing happens, write it up).
 
+### Interview Angle
+
+**Scenario:** "A service is crash-looping. `journalctl -u <service>` is
+scrolling hundreds of lines a minute. Walk me through what you do in the first
+five minutes."
+
+A junior answer starts reading from the top of the log, scrolling endlessly,
+hoping to spot "the" error — slow and easy to miss the actual signature in the
+noise. A senior answer goes straight to finding the **failure signature**:
+`journalctl -u <service> -p err --since '15 min ago' | grep -i error | awk
+-F: '{print $NF}' | sort | uniq -c | sort -rn` to surface the most frequent
+repeating error, then checks `dmesg | grep -i "killed process"` for OOM kills
+(a very common crash-loop cause) before touching the service itself. Only
+after identifying the signature do they decide on containment (`systemctl
+stop` to break the loop) — fixing blind, before you know the pattern, risks
+fixing the wrong thing while the incident continues.
+
 ---
 
 ## Step 3 — Alternatives

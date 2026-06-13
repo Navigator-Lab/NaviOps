@@ -142,6 +142,22 @@ aws ec2 describe-snapshots --owner-ids self
   after 30-90 days) is sufficient — multi-region replication, Glacier Deep
   Archive, etc. are enterprise-scale concerns.
 
+### Interview Angle
+
+**Scenario:** "Our EC2 instance was terminated overnight and we lost all its
+data. We do have nightly backups — but to a directory on that same instance's
+EBS volume. What went wrong, and what's your fix?"
+
+A junior answer says "we need backups" — but they already had backups; the
+flaw is **where** they lived. A senior answer names the actual failure: the
+backup and the data shared the same failure domain, so the one event
+(termination) destroyed both. The fix is concrete and matches this lesson's
+pattern — extend `backup.sh` with `aws s3 cp` to push the verified `.tar.gz`
+off-instance after the local `tar -tzf` check, add an S3 lifecycle policy
+(transition to Standard-IA at 30 days, expire at 90) so cost doesn't grow
+unbounded, and periodically run a restore drill (`aws s3 cp` back down, `tar
+-tzf`) — because an untested backup isn't a backup, it's an assumption.
+
 ---
 
 ## Step 3 — Alternatives
