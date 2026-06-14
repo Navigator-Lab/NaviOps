@@ -247,7 +247,7 @@ What happened:
 - The branch is a lightweight pointer to the current commit — no files are copied.
 - Naming convention: `lesson/`, `fix/`, `feat/`, `chore/` prefixes describe the type.
 
-### 4d — Make a real platform improvement
+###  4d — Make a real platform improvement
 
 Build a script that reports the repo's Git health — a genuine NaviOps `scripts/`
 artifact. **Write it yourself** (don't copy a finished script); assemble it from the
