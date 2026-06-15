@@ -337,6 +337,22 @@ safe to auto-remediate vs. alert-only?
 
 ---
 
+## NOC Angle
+
+> NOC Technician focus (Stage 1, `ROADMAP.md`).
+
+Monitoring is the **NOC's primary screen**. The open-source/commercial tools you'll actually watch (**Nagios, Zabbix, PRTG, SolarWinds**) work like CloudWatch here: **metric → threshold → alert → ticket**. The NOC loop is *acknowledge → triage severity → resolve or escalate per the matrix → document*. Build the muscle of turning an alert into a well-written ticket, not just reading the graph.
+
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** Monitoring is the defender's eyes — so attackers blind it: deleting log groups, stopping the agent, and removing alarms to evade detection. ATT&CK **T1562.008** (Disable Cloud Logs), **T1070**.
+
+**🔵 Defender (detect & harden — Step 5):** Protect log groups (retention + resource policies), **alarm on log/alarm deletion and CloudTrail `StopLogging`**, centralize logs cross-account, and treat the integrity of monitoring itself as a Sev-1 detection.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -356,6 +372,10 @@ safe to auto-remediate vs. alert-only?
 - `cloudwatch logs insights queries`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `disable cloudwatch logs detection evasion`, `MITRE ATT&CK T1562.008 disable cloud logs`, `cloudtrail stoplogging`, `blind the SOC monitoring`
+- 🔵 **Blue (defender):** `protect cloudwatch log group retention`, `alarm on log group deletion`, `centralized cross-account logging`, `detection as code`
 
 ## Lesson Status
 

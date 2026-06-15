@@ -2,7 +2,7 @@
 name: ADR-P12-ENUM
 status: Accepted
 date: 2026-06-12
-version: 1.1
+version: 1.2
 description: Error & Incident Enumeration. A surgical 5-section incident fix-card for real-world terminal errors — the Lite-tier specialization of the fast-path. NOT an explanation (EXP). Project-agnostic.
 supersedes: enum-protocol.md (root draft)
 ---
@@ -128,6 +128,7 @@ Never add it just to pad the card.
 
 | Protocol | Relationship |
 |---|---|
+| **P11 (MENTOR)** | Sibling in the terminal-help family. ENUM = deterministic *fix* card (no teaching); MENTOR = *teach* the command to mastery. Route by "wants the line (ENUM) vs wants to understand the line (MENTOR)". MENTOR may include an ENUM-style fix in its §1, then teach it. |
 | **P10 (Debugger)** | Sibling. P10 handles unknown root causes (hypothesis engine); P12 handles the deterministic-fix subset. Escalate ENUM → P10 the moment the fix stops being obvious. |
 | **P00 (Master Rule)** | ENUM is the formalized fast-path (Axiom 3); inherits the no-auto-spend / back-up-before-overwrite safety axioms. |
 | **P14 (Adaptive Improvement)** | A recurring ENUM signature is a candidate pattern to feed back into project_law or P07. |
@@ -135,6 +136,9 @@ Never add it just to pad the card.
 ---
 
 ## Changelog
+- **v1.2 (2026-06-15)**: Added the **P11 (MENTOR)** sibling row to "How Other Protocols Relate" —
+  ENUM = deterministic *fix* card, MENTOR = *teach* the command to mastery (see `ADR-P11-MENTOR.md`).
+  No behavioural change to ENUM itself.
 - **v1.1 (2026-06-13)**: Added the **REPORT-ONLY** guardrail (contract `<rule>` + Rule 0) after an
   agent printed `mode=ENUM` then *executed* the user's failing `mv` instead of writing the card.
   Root cause (P14): P12 forbade EXP/WebSearch/escalation but never forbade execution, so the base

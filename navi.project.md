@@ -54,6 +54,12 @@
   project-specific content belongs in `docs/learning/` or this file, not `.agent/`.
 
 ## Notes
+- **MENTOR (P11) teaching depth in NaviOps**: when MENTOR answers a command question, it composes
+  this project's teaching schema as its §3/§8 depth — the **Gate Rule**
+  (`docs/learning/CLAUDE_TEACHING_RULES.md`, Steps 1–3 / 5 / 6 / 8) + **Integration Lenses A–D**
+  (Three-Level Depth, Double-Explanation, Bash automation, C/systems tie-in). So command mentoring
+  matches the lesson pedagogy — and replaces reaching for an external AI chat to explain commands.
+  The generic protocol stays in `.agent/`; this binding is the project-specific overlay (D1).
 - A fresh session resumes from `docs/STATUS.md` (project/code state) **and**
   `docs/learning/LEARNING_STATE.md` (pedagogy/progress state) — read both first.
 - Origin of this project: `docs/learning/prompts/00-bootstrap-role.md` (the original

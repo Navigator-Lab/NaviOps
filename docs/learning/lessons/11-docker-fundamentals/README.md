@@ -4,7 +4,7 @@
 **Gate Rule:** Concept → Real-World Use → Alternatives → Hands-On → Verification → Quiz → Reflection → Search Keywords
 
 > **How to use this lesson:** same as Lessons 03–10. Marks the start of **Month 2**
-> per `CURRICULUM.md`.
+> per `ROADMAP.md`.
 
 ---
 
@@ -301,6 +301,16 @@ first to diagnose it, and what are you looking for in each?
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** Containers break the 'isolation' assumption: a `--privileged` container or a mounted `/var/run/docker.sock` is **root on the host**, and membership of the `docker` group equals root. Malicious images embed backdoors. ATT&CK **T1610** (Deploy Container), **T1611** (Escape to Host).
+
+**🔵 Defender (detect & harden — Step 5):** Run containers **non-root**, drop capabilities, read-only rootfs, never mount `docker.sock` into untrusted containers, **never add untrusted users to the `docker` group**, and scan images (Trivy/Grype) before running them.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -320,6 +330,10 @@ first to diagnose it, and what are you looking for in each?
 - `kubernetes vs docker compose when`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `docker container escape`, `MITRE ATT&CK T1611 escape to host`, `privileged container breakout`, `docker.sock mount privilege escalation`
+- 🔵 **Blue (defender):** `docker non-root user`, `drop linux capabilities container`, `trivy image vulnerability scanning`, `docker bench security`
 
 ## Lesson Status
 

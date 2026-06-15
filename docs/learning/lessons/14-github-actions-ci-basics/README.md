@@ -342,6 +342,16 @@ looking at your GitHub profile?
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** CI/CD is a supply-chain bullseye: `pull_request_target` + untrusted PR code = secret theft ('pwn requests'), unpinned third-party actions can be backdoored, and an over-privileged `GITHUB_TOKEN` enables tampering. ATT&CK **T1195.002**, **T1078**.
+
+**🔵 Defender (detect & harden — Step 5):** **Pin actions to a full commit SHA**, avoid running untrusted code with secrets, set `GITHUB_TOKEN` permissions least-privilege, prefer **OIDC** over long-lived cloud keys, and require branch protection + reviews on the workflow files.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -361,6 +371,10 @@ looking at your GitHub profile?
 - `github environments protection rules approval`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `github actions pwn request`, `MITRE ATT&CK T1195.002 supply chain`, `pull_request_target secret theft`, `ci pipeline poisoning`
+- 🔵 **Blue (defender):** `pin github action commit SHA`, `least privilege GITHUB_TOKEN permissions`, `OIDC github actions cloud`, `dependabot dependency scanning`
 
 ## Lesson Status
 

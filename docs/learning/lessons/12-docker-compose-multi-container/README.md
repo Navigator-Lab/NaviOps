@@ -325,6 +325,16 @@ committing it to git? Walk through the file(s) involved.
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** A multi-container stack widens the attack surface: over-published ports, secrets passed as plaintext `environment:` vars, and a flat compose network that lets one compromised service pivot to the rest. ATT&CK **T1610**, **T1078** (Valid Accounts).
+
+**🔵 Defender (detect & harden — Step 5):** Put backends on an **internal** network, publish only what's needed, pass secrets via files/`secrets:` not env, add healthchecks, and scan the whole stack. Treat the reverse proxy as the only intended ingress.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -344,6 +354,10 @@ committing it to git? Walk through the file(s) involved.
 - `kubernetes vs docker compose migration path`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `docker compose secrets exposure environment`, `container lateral movement`, `MITRE ATT&CK T1610 deploy container`, `exposed docker published ports`
+- 🔵 **Blue (defender):** `docker internal network isolation`, `docker secrets vs environment variables`, `compose security hardening`
 
 ## Lesson Status
 

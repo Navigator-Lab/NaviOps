@@ -324,6 +324,16 @@ Lesson 06)?
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** This lesson is the blue-team baseline — so study the red side it defeats: attackers run LinPEAS/linenum to enumerate weak SSH, sudo, SUID, kernel, and writable-service findings, then chain them to root and **impair defenses** (disable fail2ban/SELinux/auditd). ATT&CK **T1562** (Impair Defenses), **T1068** (Exploitation for Privilege Escalation).
+
+**🔵 Defender (detect & harden — Step 5):** Apply CIS Benchmarks systematically: SSH hardening, `fail2ban`, **SELinux enforcing**, `auditd`, least privilege, removed SUID, locked accounts. Map each control to the specific attack it blocks — that mapping *is* the lesson.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -343,6 +353,10 @@ Lesson 06)?
 - `aws security hub vs lynis`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `linpeas linux privilege escalation`, `MITRE ATT&CK T1562 impair defenses`, `linux privesc enumeration`, `disable selinux fail2ban attacker`
+- 🔵 **Blue (defender):** `CIS benchmark linux hardening`, `selinux enforcing mode`, `auditd security rules`, `lynis security audit`
 
 ## Lesson Status
 

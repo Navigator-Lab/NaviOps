@@ -285,6 +285,16 @@ is this defending against?)
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** IAM is the cloud control plane attackers most want: stolen access keys, and **privilege escalation** via misconfig (`iam:PassRole`, `CreatePolicyVersion`, `AssumeRole` chains). They enumerate with the creds they get. ATT&CK **T1078.004** (Cloud Accounts), **T1098** (Account Manipulation).
+
+**🔵 Defender (detect & harden — Step 5):** Least-privilege policies, **MFA everywhere**, no long-lived keys (use roles/IAM Identity Center), enable **CloudTrail** + IAM Access Analyzer, and alert on anomalous or first-seen API calls and policy changes.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -304,6 +314,10 @@ is this defending against?)
 - `terraform aws_iam_role example`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `aws iam privilege escalation paths`, `iam:PassRole exploit`, `MITRE ATT&CK T1078.004 cloud accounts`, `aws access key theft`
+- 🔵 **Blue (defender):** `aws iam least privilege policy`, `cloudtrail logging monitoring`, `iam access analyzer`, `aws mfa enforcement`
 
 ## Lesson Status
 

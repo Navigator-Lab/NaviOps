@@ -334,6 +334,16 @@ deployed?
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** This is the SOC core, so know what it's up against: attackers try to evade the SIEM/EDR, **generate alert noise/false positives to bury the real signal**, and kill the Wazuh agent. ATT&CK **T1562** (Impair Defenses).
+
+**🔵 Defender (detect & harden — Step 5):** Build the detections: Wazuh rules for failed SSH / brute force / port scan / rootkits, **File Integrity Monitoring**, and **MITRE ATT&CK mapping** on alerts. Then practice **alert triage and false-positive tuning** — a noisy SIEM is a blind SIEM. (Deep-dived in Lesson 28.)
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -353,6 +363,10 @@ deployed?
 - `wazuh terraform deployment automation`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `evade SIEM EDR detection`, `MITRE ATT&CK T1562 impair defenses`, `alert flooding false positive attack`, `disable wazuh agent`
+- 🔵 **Blue (defender):** `wazuh detection rules`, `file integrity monitoring fim`, `MITRE ATT&CK mapping siem`, `alert tuning false positives`
 
 ## Lesson Status
 

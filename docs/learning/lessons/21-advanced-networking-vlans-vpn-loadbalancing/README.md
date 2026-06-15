@@ -363,6 +363,16 @@ Name at least two reasons from this lesson's research.
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** Advanced network features bring advanced attacks: **VLAN hopping** (DTP/double-tagging), abused VPN credentials as remote access, and load-balancer/proxy bypass to reach backends directly. ATT&CK **T1599**, **T1133** (External Remote Services).
+
+**🔵 Defender (detect & harden — Step 5):** Disable DTP/auto-trunking and prune VLANs, require **MFA on VPN**, segment and monitor east-west traffic, and front services with a WAF so the LB isn't a soft bypass.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -382,6 +392,10 @@ Name at least two reasons from this lesson's research.
 - `aws application load balancer vs network load balancer`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `vlan hopping attack double tagging`, `MITRE ATT&CK T1599 network boundary bridging`, `vpn credential abuse remote access`, `load balancer proxy bypass`
+- 🔵 **Blue (defender):** `disable dtp auto trunking`, `vpn multi-factor authentication`, `east-west traffic monitoring`, `web application firewall waf`
 
 ## Lesson Status
 

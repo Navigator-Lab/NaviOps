@@ -356,6 +356,16 @@ answer here — this tests your ability to communicate technical work.)
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** The capstone is the full kill chain to investigate: initial access → persistence → privilege escalation → exfiltration → **anti-forensics**. Think like the red team to reconstruct what happened — every prior lesson's attacker note shows up here.
+
+**🔵 Defender (detect & harden — Step 5):** Run the IR lifecycle end-to-end — **detect, contain, eradicate, recover, report** — preserve evidence (don't tamper timestamps), **map the whole incident to MITRE ATT&CK**, find root cause, and write the runbook. This is where the attacker and defender mindsets converge into one skill.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -375,6 +385,10 @@ answer here — this tests your ability to communicate technical work.)
 - `portfolio projects devops sre github`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `cyber kill chain stages`, `MITRE ATT&CK enterprise tactics`, `linux persistence privilege escalation exfiltration`, `anti-forensics techniques`
+- 🔵 **Blue (defender):** `incident response lifecycle NIST`, `containment eradication recovery`, `MITRE ATT&CK incident mapping`, `forensic evidence preservation`
 
 ## Lesson Status
 

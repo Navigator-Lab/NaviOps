@@ -92,6 +92,6 @@ no risk floor is crossed; otherwise recommend on the boot line with a one-line *
 question only when ambiguous (`<0.7`). The human can always override.
 
 ## Protocol Map (v28)
-Active (generic): `P01` PLAN · `P02` EXP · `P03` VERIFY · `P04` Code-Audit · `P05` Blast-Radius · `P06` Command-Safety · `P07` Quality/Karpathy · `P10` Debugger · `P12` ENUM (incident card) · `P13` Dependency-Map · `P14` Adaptive-Improvement.
+Active (generic): `P01` PLAN · `P02` EXP · `P03` VERIFY · `P04` Code-Audit · `P05` Blast-Radius · `P06` Command-Safety · `P07` Quality/Karpathy · `P10` Debugger · `P11` MENTOR (command teacher) · `P12` ENUM (incident card) · `P13` Dependency-Map · `P14` Adaptive-Improvement.
 Deferred (`_deferred_domain/`, domain-specific — genericize before shipping): `P08` Frontend-UX · `P09` Performance/Observability.
 Archived (`_archive/`): predecessor project-specific protocols — restore only if such a project returns.

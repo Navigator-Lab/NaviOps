@@ -331,6 +331,22 @@ prose? Give a concrete example from your `service-down.md`.
 
 ---
 
+## NOC Angle
+
+> NOC Technician focus (Stage 1, `ROADMAP.md`).
+
+Incident handling, **documentation, and escalation** are exactly what NOC interviews probe. Learn the ticketing flow (**ServiceNow/Remedy**), a **severity classification** rubric (Sev1–Sev4), and clean **shift-handover notes** so the next analyst resumes with zero re-explanation — the same 'zero re-explanation' discipline NaviOps' `docs/` uses. This is your strongest NOC-hiring evidence.
+
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** This lesson *is* detection, so know the evasion: attackers clear/`>` logs, timestomp, inject misleading entries, and live-off-the-land to blend with normal admin activity. ATT&CK **T1070** (Indicator Removal), **T1027** (Obfuscation). Recognize the attacks in the logs: `Failed password` bursts (brute force), many ports from one IP (scan), new SUID, odd `sudo`.
+
+**🔵 Defender (detect & harden — Step 5):** Hunt with `grep`/`awk`: failed SSH (`grep 'Failed password' /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -rn`), brute force (repeat sources), port scans. **Centralize + make logs immutable**, then run the IR lifecycle (detect → contain → eradicate → recover → report) and map observed TTPs to ATT&CK.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -350,6 +366,10 @@ prose? Give a concrete example from your `service-down.md`.
 - `aws systems manager automation runbook`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `clear logs anti-forensics`, `MITRE ATT&CK T1070 indicator removal`, `timestomp linux timestamps`, `living off the land detection evasion`
+- 🔵 **Blue (defender):** `failed ssh detection grep awk`, `brute force log analysis auth.log`, `immutable centralized logging`, `incident response lifecycle`
 
 ## Lesson Status
 

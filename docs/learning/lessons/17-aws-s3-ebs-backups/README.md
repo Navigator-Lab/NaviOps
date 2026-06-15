@@ -319,6 +319,16 @@ actually work?" What's your answer, based on Step 5 of this lesson?
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** Misconfigured **public S3 buckets** are one of the most common real-world breaches; attackers also target backups directly (ransomware, snapshot exfiltration). ATT&CK **T1530** (Data from Cloud Storage), **T1486** (Data Encrypted for Impact).
+
+**🔵 Defender (detect & harden — Step 5):** **Block Public Access** account-wide, enforce bucket policies + default encryption, enable **versioning + MFA delete**, follow 3-2-1 with at least one immutable/offline copy, and turn on access logging to detect mass reads.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -338,6 +348,10 @@ actually work?" What's your answer, based on Step 5 of this lesson?
 - `terraform aws_s3_bucket_lifecycle_configuration`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `public s3 bucket data breach`, `MITRE ATT&CK T1530 data from cloud storage`, `s3 bucket misconfiguration`, `ransomware cloud backups T1486`
+- 🔵 **Blue (defender):** `s3 block public access`, `s3 versioning mfa delete`, `3-2-1 backup immutable offline`, `s3 default encryption`
 
 ## Lesson Status
 

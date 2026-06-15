@@ -379,6 +379,16 @@ you answer, given a team running entirely on AWS vs. a team running on-prem
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** Exposed **Prometheus/Grafana** endpoints leak topology and metrics and have had RCE/auth-bypass CVEs; tampered metrics can hide an attack in progress. ATT&CK **T1190** (Exploit Public-Facing Application).
+
+**🔵 Defender (detect & harden — Step 5):** Require auth + TLS, **never expose** these endpoints publicly, alert on security-relevant metrics (auth failures, restarts, resource spikes), and treat dashboards as detection — this is where metrics become threat signals.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -398,6 +408,10 @@ you answer, given a team running entirely on AWS vs. a team running on-prem
 - `terraform deploy monitoring stack`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `exposed prometheus grafana endpoint`, `MITRE ATT&CK T1190 exploit public facing application`, `grafana RCE CVE`, `metrics tampering`
+- 🔵 **Blue (defender):** `prometheus authentication tls`, `grafana security hardening`, `alerting on security events`, `detection dashboards`
 
 ## Lesson Status
 

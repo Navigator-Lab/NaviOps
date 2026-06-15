@@ -302,6 +302,22 @@ cause problems?
 
 ---
 
+## NOC Angle
+
+> NOC Technician focus (Stage 1, `ROADMAP.md`).
+
+DNS/DHCP failures and firewall/NAT misroutes are **bread-and-butter NOC tickets**. The NOC skill isn't just fixing them — it's **triage + escalation**: classify severity, attempt first-line diagnosis (`dig`, lease check, rule review), and know **when to escalate** to network engineering with a clear, documented hand-off.
+
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** DNS and the network edge are prime exfil/C2 channels: **DNS tunneling** and spoofing, rogue DHCP for MITM, and firewall-evasion / boundary bridging. ATT&CK **T1071.004** (DNS C2), **T1572** (Protocol Tunneling), **T1599** (Network Boundary Bridging).
+
+**🔵 Defender (detect & harden — Step 5):** Log & baseline DNS queries (alert on high-entropy / high-volume domains = tunneling), enable **DHCP snooping**, run a **default-deny firewall with egress filtering**, and review `ufw`/`iptables`/nftables rules for accidental allow-alls.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -321,6 +337,10 @@ cause problems?
 - `vpn site to site vs remote access basics`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `dns tunneling data exfiltration`, `MITRE ATT&CK T1071.004 dns c2`, `dns spoofing attack`, `rogue dhcp server attack`
+- 🔵 **Blue (defender):** `dns query logging anomaly detection`, `dhcp snooping`, `egress filtering firewall`, `detect dns tunneling`
 
 ## Lesson Status
 

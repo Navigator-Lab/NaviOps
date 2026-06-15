@@ -411,6 +411,16 @@ multi-host deployment instead? Reference [Distr's analysis](https://distr.sh/blo
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** A full stack = more pivot paths: a compromised service moves laterally across the compose/overlay network, exposed monitoring leaks data, and secrets sprawl across services. ATT&CK **T1610**, **T1078**.
+
+**🔵 Defender (detect & harden — Step 5):** Segment per-tier networks, centralize logs/metrics **into detection** (not just dashboards), least-privilege each service account, and do a full-stack hardening review (images, ports, secrets, proxy) before it's 'done'.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -430,6 +440,10 @@ multi-host deployment instead? Reference [Distr's analysis](https://distr.sh/blo
 - `incident response multi-service architecture runbooks`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `microservices lateral movement`, `MITRE ATT&CK T1610 deploy container`, `secrets sprawl containers`, `exposed monitoring stack`
+- 🔵 **Blue (defender):** `network segmentation per service`, `centralized detection logging`, `full stack security hardening`
 
 ## Lesson Status
 

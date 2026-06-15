@@ -417,6 +417,16 @@ This lesson uses only:
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** SUID/SGID binaries are a top local-privesc path. Attackers hunt them with `find / -perm -4000 -type f 2>/dev/null` and check **GTFOBins** for ones that spawn a root shell (e.g. a SUID `find`, `cp`, `bash`, `vim`). World-writable files/dirs enable tampering & persistence. ATT&CK **T1548.001** (Setuid/Setgid), **T1222** (File/Dir Permissions Modification).
+
+**🔵 Defender (detect & harden — Step 5):** Inventory SUID/SGID (`find / -perm -6000 -type f`), strip the bit from anything that doesn't need it, set a restrictive `umask` (027), forbid world-writable in sensitive paths, and watch permission changes with `auditd` (`-w /etc/passwd -p wa`).
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -436,6 +446,10 @@ This lesson uses only:
 - `umask explained linux defaults`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `GTFOBins SUID privilege escalation`, `find SUID binaries linux`, `MITRE ATT&CK T1548.001 setuid`, `setuid abuse linux`
+- 🔵 **Blue (defender):** `audit SUID SGID files`, `auditd watch file permissions`, `umask hardening linux`, `world-writable files security risk`
 
 ## Lesson Status
 

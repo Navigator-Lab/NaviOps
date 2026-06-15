@@ -299,6 +299,16 @@ a public and a private subnet?
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** The signature cloud attack: SSRF → **instance metadata** (IMDSv1) → steal the instance role's credentials. Plus wide-open security groups and public AMIs/EBS. ATT&CK **T1552.005** (Cloud Instance Metadata API).
+
+**🔵 Defender (detect & harden — Step 5):** **Require IMDSv2** (hop limit 1), least-privilege security groups (no `0.0.0.0/0` on SSH/RDP), keep instances in private subnets behind a bastion/SSM, and turn on **VPC Flow Logs** to spot scanning and exfil.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -318,6 +328,10 @@ a public and a private subnet?
 - `aws three tier architecture security groups`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `aws SSRF instance metadata IMDSv1`, `MITRE ATT&CK T1552.005 cloud metadata`, `open security group exploit`, `ec2 metadata credential theft`
+- 🔵 **Blue (defender):** `enforce IMDSv2 metadata`, `vpc flow logs`, `security group least privilege`, `aws systems manager session manager bastion`
 
 ## Lesson Status
 
