@@ -332,6 +332,16 @@ knowing the PID in advance?
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** Attackers enumerate accounts (`/etc/passwd`, `id`, `getent`), then escalate via sudo misconfig — `sudo -l` reveals NOPASSWD or GTFOBins-abusable commands. They masquerade malicious processes and add rogue users/UID-0 accounts. ATT&CK **T1087** (Account Discovery), **T1548.003** (Sudo), **T1036** (Masquerading).
+
+**🔵 Defender (detect & harden — Step 5):** Audit `sudoers` (`visudo -c`, no broad NOPASSWD), alert on new users / any second UID-0 account, lock unused accounts, and baseline processes so anomalies (unexpected parent, odd path) stand out in `ps`/auditd.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -351,6 +361,10 @@ knowing the PID in advance?
 - `linux process table pid_max exhaustion`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `sudo -l privilege escalation`, `MITRE ATT&CK T1548.003 sudo abuse`, `linux account enumeration /etc/passwd`, `process masquerading T1036`
+- 🔵 **Blue (defender):** `sudoers audit visudo`, `detect rogue UID 0 account`, `auditd process monitoring`, `least privilege linux users`
 
 ## Lesson Status
 

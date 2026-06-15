@@ -24,6 +24,7 @@
 | `.agent/workflows/Navi-cc.md` | ✅ | Generic tool mappings; subagent + WebSearch enforcement |
 | `ADR-P00-Master-Rule.md` | ✅ v28 | Constitution; **Context Economy** standards + tier-selection note |
 | `ADR-P01–P14` | ✅ | Generic, XML `<contract>` headers |
+| `ADR-P11-MENTOR.md` | ✅ **NEW (2026-06-15)** | Command-scoped teacher; sibling of ENUM. DRY-by-reference (P02 Phase 8/2 · P07 · P10 §5); REPORT-ONLY |
 | `~/.claude/commands/navi.md` | ✅ **version-less pointer** | Boot + intent flow; no hardcoded version/boot-format |
 | `.claude/skills/navi/SKILL.md` | ✅ | Natural-language auto-trigger (description version-less) |
 | `.claude/agents/{navi-research,navi-audit,navi-debug}.md` | ✅ | Isolated-context subagents |

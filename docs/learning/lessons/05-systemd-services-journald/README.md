@@ -304,6 +304,16 @@ follow new entries live afterward?
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** systemd units & timers are a clean persistence mechanism (drop a malicious `.service`/`.timer`, `enable` it). Attackers also tamper with or clear journald to cover tracks. ATT&CK **T1543.002** (Systemd Service), **T1070** (Indicator Removal), **T1562.001** (Disable/Modify Tools).
+
+**🔵 Defender (detect & harden — Step 5):** Review enabled units & timers (`systemctl list-unit-files --state=enabled`, `list-timers`), **forward logs to a remote/immutable store** so local wipes don't hide activity, and alert on journal gaps or `systemctl` changes to critical units.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -323,6 +333,10 @@ follow new entries live afterward?
 - `ansible systemd module manage services`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `malicious systemd service persistence`, `MITRE ATT&CK T1543.002 systemd`, `systemd timer backdoor`, `clear journald logs anti-forensics`
+- 🔵 **Blue (defender):** `audit enabled systemd units`, `remote syslog log forwarding`, `detect log tampering journald`, `systemctl change monitoring`
 
 ## Lesson Status
 

@@ -477,6 +477,16 @@ Fundamentals) will write a script that touches file permissions
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** Public git history is a credential goldmine — attackers run trufflehog/gitleaks over repos and `git log -p` for keys, `.env`, and tokens that were 'deleted' but remain in history. Exposed `.git/` dirs on web servers leak source. Poisoned PRs can run malicious CI. ATT&CK **T1552.001** (Credentials in Files), **T1195** (Supply Chain).
+
+**🔵 Defender (detect & harden — Step 5):** Pre-commit secret scanning (Gitleaks — already wired here), branch protection + required reviews + signed commits, **rotate-then-rewrite** on any leak (never just delete the commit), scope CI secrets least-privilege, and never serve `.git/`.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -496,6 +506,10 @@ Fundamentals) will write a script that touches file permissions
 - `conventional commits specification`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `secrets in git history`, `trufflehog gitleaks repo scanning`, `MITRE ATT&CK T1552.001 credentials in files`, `exposed .git directory web`
+- 🔵 **Blue (defender):** `gitleaks pre-commit hook`, `git leaked secret rotation`, `branch protection signed commits`, `github secret scanning`
 
 ## Lesson Status
 

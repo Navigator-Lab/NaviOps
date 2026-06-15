@@ -46,6 +46,7 @@ Emit `🧭 Navi v28 | project=<name> | stack=<…> | mode=<INTENT> | protocols=<
 
 `EXPLAIN/RESEARCH` → `P02` · `PLAN/REFACTOR` → `P01` · `BUILD` → `P01`(+`P04`) ·
 `DEBUG` → `P02`+`P10` · `ENUM` → `P12` (deterministic-fix incident card; Lite) ·
+`MENTOR` → `P11` (command teacher — "what does X do / best practice / teach me / what did I do wrong and why"; Lite, REPORT-ONLY) ·
 `VERIFY` → `P02`+`P03` · `REVIEW` → `P04`+`P07`+`karpathy` ·
 `OPERATE` → `P06`(+`P09`). Ambiguous → ask one question (confidence-gate).
 

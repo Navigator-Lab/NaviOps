@@ -437,6 +437,16 @@ principle.
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** Terraform **state files store secrets in plaintext** — a stolen `.tfstate` can hand over the whole environment. Malicious/unpinned modules and drift to open-access are supply-chain + misconfig risks. ATT&CK **T1552** (Unsecured Credentials), **T1195**.
+
+**🔵 Defender (detect & harden — Step 5):** Use **encrypted remote state with locking** (S3+DynamoDB/native lock), keep secrets out of code (SSM/Secrets Manager/vault), **scan IaC with tfsec/checkov** in CI, review every `plan` before `apply`, and give the provider least-privilege credentials.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -456,6 +466,10 @@ principle.
 - `prometheus grafana terraform deployment`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `terraform state secrets plaintext`, `MITRE ATT&CK T1552 unsecured credentials`, `malicious terraform module`, `infrastructure as code supply chain`
+- 🔵 **Blue (defender):** `tfsec checkov iac scanning`, `encrypted remote state locking`, `terraform secrets management vault`
 
 ## Lesson Status
 

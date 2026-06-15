@@ -324,6 +324,16 @@ Lesson 03 Q3)? Give an example specific to `backup.sh`'s retention logic.
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** Cron is a classic persistence + privesc vector: writable cron dirs, jobs run as root, and **wildcard injection** in `tar`/`rsync` cronjobs. logrotate `postrotate` scripts can be abused too. ATT&CK **T1053.003** (Cron).
+
+**🔵 Defender (detect & harden — Step 5):** Audit `/etc/cron*`, `/var/spool/cron`, and per-user crontabs; restrict perms; avoid wildcards in privileged jobs (use `--` / absolute paths); monitor crontab changes with auditd and review logrotate scripts.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -343,6 +353,10 @@ Lesson 03 Q3)? Give an example specific to `backup.sh`'s retention logic.
 - `3-2-1 backup strategy linux`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `cron persistence privilege escalation`, `MITRE ATT&CK T1053.003 cron`, `cron wildcard injection tar`, `writable cron directory abuse`
+- 🔵 **Blue (defender):** `audit crontab changes auditd`, `secure cron file permissions`, `logrotate postrotate security`
 
 ## Lesson Status
 

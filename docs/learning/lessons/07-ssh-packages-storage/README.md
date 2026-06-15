@@ -329,6 +329,16 @@ open-file-descriptor mechanism from Lesson 06.)
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** SSH `authorized_keys` is a favourite backdoor (drop a key = silent persistence); weak auth invites brute force; package managers are a supply-chain target (typosquats, unsigned repos). ATT&CK **T1098.004** (SSH Authorized Keys), **T1110** (Brute Force), **T1195** (Supply Chain).
+
+**🔵 Defender (detect & harden — Step 5):** Key-only SSH + `fail2ban`, **monitor `~/.ssh/authorized_keys` for changes** (auditd/FIM), verify package signatures/checksums, pin trusted repos, and mount untrusted filesystems `nosuid,nodev,noexec`.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -348,6 +358,10 @@ open-file-descriptor mechanism from Lesson 06.)
 - `linux disk full troubleshooting deleted file still open`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `ssh authorized_keys backdoor`, `MITRE ATT&CK T1098.004 ssh keys`, `ssh brute force attack`, `package supply chain typosquatting`
+- 🔵 **Blue (defender):** `ssh key-only authentication hardening`, `fail2ban ssh protection`, `file integrity monitoring authorized_keys`, `verify package signatures gpg`
 
 ## Lesson Status
 

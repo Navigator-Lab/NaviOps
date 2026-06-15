@@ -290,6 +290,22 @@ communication path?
 
 ---
 
+## NOC Angle
+
+> NOC Technician focus (Stage 1, `ROADMAP.md`).
+
+Subnetting and OSI/TCP-IP are **core NOC knowledge** — on shift you read `ip`/`ss`/`ping`/`traceroute` and a network-monitoring dashboard (**SolarWinds, PRTG, Zabbix, Nagios**) showing interface/link health. Knowing the address plan tells you instantly whether an alerting host is in-scope and where it sits. Practice reading a dashboard alert and tracing it to the right segment.
+
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** This is the recon layer: attackers map the network with `nmap`/`ss`, sniff traffic on a shared subnet, and ARP-spoof to MITM. Knowing OSI/TCP-IP is exactly what lets them find the soft targets. ATT&CK **T1046** (Network Service Discovery), **T1040** (Network Sniffing).
+
+**🔵 Defender (detect & harden — Step 5):** Segment with VLANs/subnets, default-deny between zones, run an IDS and **port-scan detection** (e.g. fail2ban recidive, Suricata), encrypt traffic so sniffing yields nothing, and alert on unexpected east-west connections.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -309,6 +325,10 @@ communication path?
 - `vpc subnet design aws best practices`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `nmap network scanning techniques`, `MITRE ATT&CK T1046 network service discovery`, `arp spoofing man in the middle`, `network sniffing T1040`
+- 🔵 **Blue (defender):** `network segmentation vlan`, `port scan detection IDS`, `suricata snort intrusion detection`, `detect arp spoofing`
 
 ## Lesson Status
 

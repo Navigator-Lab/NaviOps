@@ -344,6 +344,16 @@ curriculum; consider writing a bit more than usual)*
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** The RHCSA objectives are exactly the misconfigs attackers exploit: weak permissions, an open `firewalld`, permissive/disabled SELinux, and loose `sudo`. Studying the exam *is* studying the hardening baseline.
+
+**🔵 Defender (detect & harden — Step 5):** Drill each RHCSA security objective as a blue-team control — `firewalld` default-deny, **SELinux enforcing** (and how to debug it without disabling it), scoped `sudo`, SSH key auth — and for each ask 'what attack does this stop?'
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -364,6 +374,10 @@ curriculum; consider writing a bit more than usual)*
 - `terraform associate certification` (builds on Lessons 20, 25)
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `rhcsa security misconfigurations`, `linux privilege escalation weak permissions`, `attacker abuses permissive selinux firewall`
+- 🔵 **Blue (defender):** `firewalld default deny zones`, `selinux enforcing troubleshooting audit2allow`, `sudo configuration hardening`, `ssh key authentication rhcsa`
 
 ## Lesson Status
 

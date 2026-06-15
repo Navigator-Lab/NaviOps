@@ -341,6 +341,16 @@ under the hood when it runs a task against a remote host? (Tie back to Lesson
 
 ---
 
+## Lens E — Attacker & Defender (Red / Blue)
+
+> Red/Blue framing (Gate Rule **Lens E**, D14). Build *both* mindsets: know how the
+> tools in this lesson are abused, and how a defender detects and stops them.
+> Frameworks: [GTFOBins](https://gtfobins.github.io/) · [MITRE ATT&CK](https://attack.mitre.org/) · [LOLBAS](https://lolbas-project.github.io/).
+
+**🔴 Attacker (how it's abused — Step 2):** The Ansible control node is a force multiplier — compromise it and you push changes to **every** managed host. Secrets sit in plaintext vars/playbooks; untrusted Galaxy roles run with `become`. ATT&CK **T1072** (Software Deployment Tools).
+
+**🔵 Defender (detect & harden — Step 5):** Encrypt secrets with **ansible-vault**, vet/pin roles, lock down and audit the control node, review playbooks through Git (GitOps), and scope `become` to the minimum needed per play.
+
 ## Step 8 — Search Keywords For Further Understanding
 
 **Core**
@@ -360,6 +370,10 @@ under the hood when it runs a task against a remote host? (Tie back to Lesson
 - `terraform plus ansible workflow`
 
 ---
+
+**Red / Blue (Lens E — study attacker & defender in parallel):**
+- 🔴 **Red (attacker):** `ansible control node compromise`, `MITRE ATT&CK T1072 deployment tools`, `ansible plaintext secrets vars`, `malicious ansible galaxy role`
+- 🔵 **Blue (defender):** `ansible-vault encrypt secrets`, `ansible become least privilege`, `gitops playbook review`
 
 ## Lesson Status
 
