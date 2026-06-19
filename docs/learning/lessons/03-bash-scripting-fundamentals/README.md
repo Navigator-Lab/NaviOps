@@ -331,23 +331,52 @@ in the lesson/commit per `navi.project.md` Hard Rule #1.
 flag would catch.
 
 > **Your answer:**
+> * **Short Version:**
+>   * `-e` (errexit): Halts the script if any command fails (non-zero exit status). Bug caught: `cd /nonexistent_dir` fails, preventing the execution of `rm -rf *` inside the current directory.
+>   * `-u` (nounset): Halts the script if a variable is unbound/unset. Bug caught: Misspelled variable in `rm -rf "$MISTAKE_VAR/*"` resolves to `rm -rf /*`.
+>   * `-o pipefail`: Propagates pipeline failure codes. Bug caught: `missing_cmd | grep "error"` fails the script instead of returning `0` due to `grep` succeeding on empty input.
+> * **Professional Answer:**
+>   * `set -e` (errexit): Instructs the shell to immediately terminate execution if any simple command returns a non-zero exit status. This stops cascading failures when setup tasks fail.
+>   * `set -u` (nounset): Treats references to undefined variables as errors, halting execution. This prevents critical directory paths from resolving to empty strings, which could execute destructive commands on unintended paths.
+>   * `set -o pipefail`: Configures pipelines to return the exit status of the rightmost command to fail, rather than default to the last command's status. This ensures silent failures in pipelined processes are caught.
 
 **Q2.** Why must you quote variables like `"$DIR"` in commands like `rm -rf "$DIR"/*`?
 What's the worst-case failure if you don't?
 
 > **Your answer:**
+> * **Short Version:**
+>   * Unquoted variables undergo word splitting and globbing. If `$DIR` contains spaces, the command splits into multiple paths.
+>   * Worst-case: If `$DIR` is empty or undefined, `rm -rf $DIR/*` expands to `rm -rf /*`, recursively deleting the system root.
+> * **Professional Answer:**
+>   * Double-quoting prevents the shell from applying Word Splitting and Filename Expansion (globbing) to the expanded value of a variable.
+>   * Without quotes, if `DIR="my backup"`, the command executes `rm -rf my backup/*`, treating `my` and `backup/*` as separate arguments.
+>   * Worst-case: If `DIR` is empty, `rm -rf $DIR/*` evaluates directly to `rm -rf /*`, running a recursive delete on the system root. Quotes ensure it evaluates to `rm -rf ""/*`, causing a safe error.
 
 **Q3.** A cron job runs your script every 5 minutes. The script isn't idempotent —
 explain what that means here, and give a concrete example of how a non-idempotent
 health-check script could cause harm over time.
 
 > **Your answer:**
+> * **Short Version:**
+>   * Idempotency means running the script repeatedly yields the same system state with no extra side-effects.
+>   * Harm: A non-idempotent script might continuously append text to configuration files or launch duplicate server instances, leading to disk full errors or memory crashes.
+> * **Professional Answer:**
+>   * An idempotent script produces the exact same system state whether run once or multiple times.
+>   * A non-idempotent health check running repeatedly on cron can cause cumulative damage. For example, if it appends a line to `/etc/hosts` on every execution, it will eventually exhaust disk space and slow down system DNS resolution. If it attempts to restart a systemd service without checking if it is already transitioning, it can cause service instability.
 
 **Q4.** Your script has a pipeline: `grep ERROR /var/log/app.log | wc -l`. If
 `/var/log/app.log` doesn't exist, what does `$?` show with and without
 `set -o pipefail`? Why does this matter?
 
 > **Your answer:**
+> * **Short Version:**
+>   * Without `pipefail`: `$?` is `0` (because `wc -l` succeeds).
+>   * With `pipefail`: `$?` is `2` (grep error status).
+>   * Why it matters: Prevents silent failure where critical log files are missing but monitoring tools report success.
+> * **Professional Answer:**
+>   * Without `set -o pipefail`, the pipeline exit status `$?` is `0` because `wc -l` executed successfully.
+>   * With `set -o pipefail`, `$?` is non-zero (typically `2` because `grep` failed to locate the file).
+>   * Why it matters: If a missing file is not detected, automated SRE monitoring checks will falsely report success (`0`), masking a major system auditing outage.
 
 **Q5.** **Scenario:** Your `user_audit.sh` script reports a user's home directory as
 `drwxr-xr-x`. Based on Lesson 01, can other users **list** the contents of that
@@ -356,6 +385,14 @@ filename)? Explain the `r` vs `x` distinction precisely. *(Spaced review — Les
 carry-over.)*
 
 > **Your answer:**
+> * **Short Version:**
+>   * Yes to both: they can list files and access them.
+>   * Read (`r`) allows listing names. Execute (`x`) allows entering the directory and reading/writing files with known paths.
+> * **Professional Answer:**
+>   * Yes, other users can do both because the permissions permit others (`o+rx`).
+>   * Read (`r`) permission on a directory allows reading its file list (e.g. running `ls /home/user`).
+>   * Execute (`x`) permission allows a user to traverse into the directory (e.g. `cd /home/user`) and access file metadata/contents if the file path is known.
+>   * If `r` was missing but `x` was present, users couldn't list filenames, but could still open `file.txt` if they knew its exact path. If `x` was missing but `r` was present, they could see the filenames but couldn't open or modify any files inside.
 
 **Q6.** **Scenario:** You need to recursively fix permissions on `/srv/shared` so a
 group of users can collaborate, but `chmod -R 775 /srv/shared` has a known pitfall.
@@ -363,12 +400,45 @@ What is it, and what's the better fix (setgid bit / ACLs)? *(Spaced review — L
 carry-over.)*
 
 > **Your answer:**
+> * **Short Version:**
+>   * Pitfall: `chmod -R 775` makes every file executable, creating security risks.
+>   * Better Fix: Use capital `X` (`chmod -R u=rwX,g=rwX,o=rX`) and set the SetGID bit (`chmod g+s`) so new files inherit the group ownership automatically.
+> * **Professional Answer:**
+>   * **Pitfall**: Applying `-R 775` recursively sets the execute bit (`x`) on all standard text files, creating potential SUID/injection security hazards.
+>   * **Better Fix**:
+>     1. Apply execution permissions selectively (using capital `X` which only targets directories):
+>        ```bash
+>        find /srv/shared -type d -exec chmod 775 {} +
+>        find /srv/shared -type f -exec chmod 664 {} +
+>        ```
+>     2. Set the **SetGID bit** on the directories so new files created inherit the parent group, rather than the creating user's default group:
+>        ```bash
+>        chmod g+s /srv/shared
+>        ```
+>     3. Configure **Access Control Lists (ACLs)** to enforce default read-write permissions:
+>        ```bash
+>        setfacl -d -m g::rwx /srv/shared
+>        ```
 
 **Q7.** You're about to commit `scripts/user_audit.sh`. Based on Lesson 02, walk
 through the exact Git commands you'd run, and explain what `git diff --staged` shows
 you *before* committing — why is that check valuable for a script like this one?
 
 > **Your answer:**
+> * **Short Version:**
+>   * Commands: `git status` -> `git add scripts/user_audit.sh` -> `git diff --staged` -> `git commit -m "feat(lesson-03): add user_audit.sh script"`.
+>   * `git diff --staged` compares the Index (staging area) to HEAD.
+>   * Value: It acts as a pre-commit review to ensure no temporary debugging code, errors, or secrets are accidentally committed.
+> * **Professional Answer:**
+>   * **Commands**:
+>     ```bash
+>     git status
+>     git add scripts/user_audit.sh
+>     git diff --staged
+>     git commit -m "feat(lesson-03): add user_audit.sh script"
+>     ```
+>   * **Staged Diff**: `git diff --staged` (or `--cached`) shows the changes between your staging area (index) and the last commit (`HEAD`). 
+>   * **Value**: It serves as a mandatory self-review gate. For shell scripts, it helps catch temporary hardcoded paths, unquoted variables, or secrets (e.g. debug tokens) before they are written to history.
 
 **Q8.** Your script writes secrets (e.g., it temporarily echoes an API key for
 debugging) to `/tmp/user_audit_*.log`, and you accidentally `git add` that log file.
@@ -376,16 +446,29 @@ Walk through the leaked-secret response from Lesson 02 — what's the correct or
 operations? *(Spaced review — Lesson 02 carry-over.)*
 
 > **Your answer:**
+> * **Short Version:**
+>   * 1. Rotate and revoke the leaked secret immediately.
+>   * 2. Unstage the log: `git restore --staged /tmp/user_audit_*.log`.
+>   * 3. Update `.gitignore` to block `/tmp/`.
+>   * 4. If committed/pushed: use BFG or `git-filter-repo` to purge the history.
+> * **Professional Answer:**
+>   * **Leaked-Secret Response Protocol**:
+>     1. **Revoke and Rotate**: Assume the secret is compromised instantly. De-authorize and generate a new key/token.
+>     2. **Unstage the File**: If not committed, run `git restore --staged /tmp/user_audit_*.log` (or `git rm --cached`).
+>     3. **Ignore Future Logs**: Add `/tmp/` or `/tmp/user_audit_*.log` to your `.gitignore`.
+>     4. **History Cleansing**: If the log file was committed, simple removal is not enough as it remains in historical blobs. Use `git-filter-repo` or BFG Repo-Cleaner to strip the secret from the entire history.
 
 ---
 
 ## Step 7 — Reflection
 
-*(Fill in after the quiz)*
-
 - What did you learn?
+  * I learned how to write defensive production-grade Bash scripts using strict mode headers (`set -euo pipefail`) and custom IFS configurations.
+  * I learned how to implement a clean logging utility and write robust traversal loops using shell directory globbing instead of raw `ls` parsing.
 - What confused you?
+  * The behavior of `find` exiting with status `1` when encountering traversal permission errors on other directories, which immediately crashed the pipeline under `set -o pipefail`.
 - What would you do differently?
+  * Always run commands that might return expected non-fatal non-zero codes within isolated grouping brackets with `|| true` to keep strict pipelines running safely.
 
 ### Spaced Review — status
 
@@ -435,11 +518,11 @@ re-tests leaked-secret ordering).
 
 ## Lesson Status
 
-- [ ] Hands-on task completed (Step 4) — `scripts/user_audit.sh` built, tested, committed
-- [ ] Verification passed (Step 5)
-- [ ] Quiz answered + professional-answer comparisons requested (Step 6)
-- [ ] Reflection completed (Step 7)
-- [ ] Search Keywords reviewed (Step 8)
+- [x] Hands-on task completed (Step 4) — `scripts/user_audit.sh` built, tested, committed
+- [x] Verification passed (Step 5)
+- [x] Quiz answered + professional-answer comparisons requested (Step 6)
+- [x] Reflection completed (Step 7)
+- [x] Search Keywords reviewed (Step 8)
 
 When all boxes are checked, run the **Update Protocol**
 (`docs/learning/CLAUDE_TEACHING_RULES.md`) to update `LEARNING_STATE.md`,

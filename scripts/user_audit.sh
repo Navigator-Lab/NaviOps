@@ -1,57 +1,55 @@
-#!/usr/bin/env bash
+#! /usr/bin/env bash 
 
-# Header Gaurd
+# HEADER GAURD
 set -euo pipefail
 IFS=$'\n\t'
 
 LOG_FILE=/tmp/usr_audit_$(date +%Y%m%d_%H%M%S).log
 
 log() {
-	echo -e "[$(date +'%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+    echo -e "[$(date +'%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
 check_uid0_accounts() {
-	log "Start Checking User IDs' With Root Privilage (UID 0)"
-	echo "========================================"
-	awk -F: '$3 == 0 {print $1}' /etc/passwd
+    log "Checking for UID 0 (root-equivalent) accounts..."
+    awk -F: '$3 == 0 {print $1}' /etc/passwd | while read -r user; do
+        log "  Found UID 0 account: $user"
+    done
 }
 
-check_home_world_writable() {
-	log "Start Checking Home World Writable Files"
-	echo "========================================"
-	local target_dir=$1
-	find "$target_dir" -perm -o+w -type f 2>/dev/null || true 
+check_world_writable() {
+    local target_dir="${1}"
+    log "Scanning for world-writable files in: $target_dir..."
+    { find "$target_dir" -type f -perm -o+w 2>/dev/null || true; } | while read -r file; do
+        log "  SECURITY WARNING: World-writable file found: $file"
+    done
 }
 
-check_home_permissions () {
-	log "start checking home permissions"
-	echo "========================================"
-	shopt -s nullglob
-	for dir in /home/*/; do
-		if [ -d $dir ]; then
-			stat $dir 2>/dev/null || true
-		fi
-	done
-	shopt -u nullglob
+check_home_permissions() {
+    log "Checking permissions of user directories under /home..."
+    for dir in /home/*/; do
+        local clean_dir="${dir%/}"
+        if [[ ! -d "$clean_dir" ]]; then
+            continue
+        fi
+        local perms
+        perms=$(stat -c "%a" "$clean_dir")
+        log "  Directory: $clean_dir | Permissions: $perms"
+    done
 }
-
 
 main() {
-        # 1. بنر البداية
-        log "=== STARTING SECURITY USER AUDIT ==="
-
-        # 2. استدعاء الفحوصات بالترتيب وتمرير المعاملات اللازمة
-        check_uid0_accounts
-
-        # نمرر المسار /home هنا لتستقبله الدالة كـ $1
-        check_home_world_writable "/home"
-
-        check_home_permissions
-
-        # 3. بنر النهاية مع طباعة مسار ملف السجل
-        log "=== AUDIT COMPLETED ==="
-        log "Log file saved to: $LOG_FILE"
+    log "========================================="
+    log "Starting Security Audit..."
+    log "========================================="
+    
+    check_uid0_accounts
+    check_world_writable "/home"
+    check_home_permissions
+    
+    log "========================================="
+    log "Audit Complete. Log saved to: $LOG_FILE"
+    log "========================================="
 }
 
-# تشغيل السكربت عبر استدعاء الدالة الرئيسية في السطر الأخير
 main "$@"
