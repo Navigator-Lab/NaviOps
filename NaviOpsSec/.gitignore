@@ -1,0 +1,58 @@
+# Secrets — never commit
+.secrets/
+**/.env
+.env.*
+.aws/
+*.pem
+*.ppk
+id_rsa*
+id_ed25519*
+*.key
+
+# Private interview prep — never published (per EXP_REPORT_2026-06-11_Portfolio-Repo-Restart-and-Authenticity)
+*.private.md
+
+# Internal Navi project-management docs — local memory only, not recruiter-facing
+# (may reference personal/strategy details). docs/learning/ (the curriculum) stays public.
+docs/reports/
+docs/*.md
+docs/learning/JOB_MILESTONES.md
+docs/learning/JIRA.md
+docs/learning/LEARNING_STATE.md
+docs/learning/CLAUDE_TEACHING_RULES.md
+docs/learning/prompts/
+docs/learning/ROADMAP.md
+# Terraform (per github/gitignore Terraform.gitignore)
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Navi internal state
+.agent/state/active_project.json
+
+# Backups & archives
+_backup_*/
+.agent/_backup_*/
+
+# Node (future tooling)
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+
+# OS / editor
+.DS_Store
+*.log

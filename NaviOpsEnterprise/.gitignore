@@ -1,0 +1,24 @@
+# Secrets — never commit
+.secrets/
+.env
+.env.*
+*.key
+*.pem
+*.pfx
+*-agent.key
+
+# Real/sensitive data (public-repo discipline — navi.project.md HR#1)
+**/*-REAL.*
+**/private/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Local-only working notes
+JIRA.md
+scratch/
+*.local.md
