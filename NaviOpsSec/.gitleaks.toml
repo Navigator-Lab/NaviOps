@@ -1,0 +1,19 @@
+title = "NaviOps gitleaks config"
+
+# Extend the default ruleset (AWS keys, private keys, generic API tokens, etc.)
+[extend]
+useDefault = true
+
+# Allowlist the documentation placeholders so they don't trip the scanner.
+[allowlist]
+description = "Placeholders used throughout docs/learning/"
+regexes = [
+  '''<ACCOUNT_ID>''',
+  '''<INSTANCE_ID>''',
+  '''<ARN>''',
+  '''<KEY_NAME>''',
+  '''<HOSTNAME>''',
+  '''<IP>''',
+  '''203\.0\.113\.\d{1,3}''',  # RFC 5737 TEST-NET-3
+  '''10\.0\.\d{1,3}\.\d{1,3}''',
+]
