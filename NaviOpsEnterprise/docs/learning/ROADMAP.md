@@ -98,6 +98,13 @@ role each one serves. The lesson schema (how each is taught) is authoritative in
 | 35 | IT Support Capstone | Manage an IT-support environment: users, permissions, devices, software, documentation, incidents | `capstones/35-…` portfolio package |
 | 36 | Junior SysAdmin Capstone | Operate as a junior sysadmin: provision systems, manage accounts, handle incidents, run backups, write reports | `capstones/36-…` portfolio package |
 
+### Track Extension — Cloud Identity
+| # | Lesson | What it proves | Deliverable |
+|---|---|---|---|
+| 37 | Entra ID (Azure AD) Fundamentals | Cloud-identity counterpart to on-prem AD (L18): MFA/sign-in triage, Conditional Access, RBAC, hybrid sync — where help-desk tickets actually touch Azure | Runbook + `scripts/entra_signin_report.ps1`; pairs with NaviOps L31 (Azure bridge) |
+
+> Appended (not renumbered) to preserve existing lesson IDs. **Study position:** after L11 (M365) and L18 (Active Directory). Certs: MS-900 / SC-900.
+
 ## What "done" looks like for a lesson
 A lesson is complete when its `lessons/NN-…/README.md` covers all 12 sections, the **6-artifact
 evidence package** is committed (runbook, troubleshooting guide, ticket notes, KB article,
