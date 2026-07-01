@@ -183,6 +183,10 @@ experience.
 
 ## Step 4 — Hands-On Task (build this yourself)
 
+> ▶ **Do this on the lab**: start the environment first — `./infra/bootstrap.sh up` (once: `pull`), then
+> `docker exec -it naviops-web bash`. **Node:** naviops-web + naviops-db. **Artifact:** work `docs/learning/RHCSA-SERVICE-LABS.md` (NFS/Apache/BIND/SELinux).
+> Reference solution (after you try): `docs/learning/reference-solutions/` (gitignored answer key).
+
 **Goal:** Close the identified gaps with timed, exam-style drills on
 AlmaLinux/Rocky (or RHEL Developer Subscription), and produce a final
 self-assessment.

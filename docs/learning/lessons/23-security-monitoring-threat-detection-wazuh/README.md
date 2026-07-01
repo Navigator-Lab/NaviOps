@@ -189,6 +189,10 @@ alerts to Lesson 19's "detection without response" failure mode.
 
 ## Step 4 — Hands-On Task (build this yourself)
 
+> ▶ **Do this on the lab**: start the environment first — `./infra/bootstrap.sh up` (once: `pull`), then
+> `docker exec -it naviops-web bash`. **Node:** the NaviOpsSec Wazuh lab (../NaviOpsSec/infra/) + naviops-web. **Artifact:** build `scripts/threat_scan.sh`.
+> Reference solution (after you try): `docs/learning/reference-solutions/` (gitignored answer key).
+
 **Goal:** Deploy a Wazuh manager (single-node, via the official Docker
 Compose or installation script) and one Wazuh agent on your lab VM; configure
 FIM on critical paths, and trigger + observe a brute-force detection alert.

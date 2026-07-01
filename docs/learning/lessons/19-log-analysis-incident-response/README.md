@@ -187,6 +187,10 @@ fixing the wrong thing while the incident continues.
 
 ## Step 4 — Hands-On Task (build this yourself)
 
+> ▶ **Do this on the lab**: start the environment first — `./infra/bootstrap.sh up` (once: `pull`), then
+> `docker exec -it naviops-web bash`. **Node:** naviops-web + monitoring stack. **Artifact:** read Grafana/Nagios; build `scripts/alert_triage.sh`.
+> Reference solution (after you try): `docs/learning/reference-solutions/` (gitignored answer key).
+
 **Goal:** Write `docs/runbooks/service-down.md` — a runbook for "a NaviOps
 service/script is failing" — and practice a simulated incident + blameless
 postmortem.

@@ -1,0 +1,27 @@
+# Prometheus for the NaviOpsNetwork NOC lab.
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs: [{ targets: ['localhost:9090'] }]
+
+  - job_name: node
+    static_configs: [{ targets: ['node-exporter:9100'] }]
+
+  # blackbox ICMP probe — the "is the target reachable?" NOC check.
+  # Add lab hosts/gateways here, then build a Grafana panel from probe_success.
+  - job_name: blackbox-icmp
+    metrics_path: /probe
+    params: { module: [icmp] }
+    static_configs:
+      - targets:
+          - 1.1.1.1          # replace with lab targets (10.10.1.1, 10.10.2.1, …)
+          - 8.8.8.8
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115

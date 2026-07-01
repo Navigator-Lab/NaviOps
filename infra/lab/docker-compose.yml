@@ -1,0 +1,62 @@
+# NaviOps Practice Lab — systemd-enabled Linux "servers" for hands-on lessons.
+#
+# Choice: containers (not VMs) so the lab is light and runs on any machine with Docker.
+# The nodes use a systemd-enabled image so Lessons 05 (systemd/journald), 07 (SSH/storage),
+# 09 (firewalld), and 27 (RHCSA service labs: NFS/Apache/BIND/SELinux) are practiced for real.
+#
+# Bring up:  ../bootstrap.sh up     (or: docker-compose up -d)
+# Shell in:  docker exec -it naviops-web bash
+# Offline:   images pull once; after that this runs with no internet.
+
+name: naviops-lab
+
+services:
+  # Primary practice node — web/app server role (systemd, users, services, storage).
+  web:
+    image: jrei/systemd-ubuntu:22.04
+    container_name: naviops-web
+    hostname: web.naviops.lab
+    privileged: true            # required so systemd can manage cgroups/services in-container
+    stop_signal: SIGRTMIN+3     # clean systemd shutdown
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - naviops-web-data:/srv
+    tmpfs:
+      - /run
+      - /run/lock
+    networks:
+      lab:
+        ipv4_address: 172.28.0.10
+    ports:
+      - "2210:22"     # ssh practice  (ssh -p 2210 root@localhost after you set it up in Lesson 07)
+      - "8080:80"     # apache/nginx practice (Lesson 27)
+
+  # Secondary node — database/backup role (backups, cron, log rotation, NFS client).
+  db:
+    image: jrei/systemd-ubuntu:22.04
+    container_name: naviops-db
+    hostname: db.naviops.lab
+    privileged: true
+    stop_signal: SIGRTMIN+3
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - naviops-db-data:/var/lib/naviops
+    tmpfs:
+      - /run
+      - /run/lock
+    networks:
+      lab:
+        ipv4_address: 172.28.0.11
+    ports:
+      - "2211:22"
+
+networks:
+  lab:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24   # practice subnetting math (Lesson 08) against a real network
+
+volumes:
+  naviops-web-data:
+  naviops-db-data:

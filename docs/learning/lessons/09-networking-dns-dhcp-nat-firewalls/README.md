@@ -176,6 +176,10 @@ recent hardening pass that forgot to allow the app's port before enabling.
 
 ## Step 4 — Hands-On Task (build this yourself)
 
+> ▶ **Do this on the lab**: start the environment first — `./infra/bootstrap.sh up` (once: `pull`), then
+> `docker exec -it naviops-web bash`. **Node:** naviops-web. **Artifact:** firewalld/iptables here; build `scripts/firewall_audit.sh`.
+> Reference solution (after you try): `docs/learning/reference-solutions/` (gitignored answer key).
+
 **Goal:** Build `scripts/firewall_audit.sh` and a DNS-resolution diagnostic walkthrough.
 
 ### Lens C — Manual → Automated → Why

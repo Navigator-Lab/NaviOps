@@ -167,6 +167,10 @@ sibling container.
 
 ## Step 4 — Hands-On Task (build this yourself)
 
+> ▶ **Do this on the lab**: start the environment first — `./infra/bootstrap.sh up` (once: `pull`), then
+> `docker exec -it naviops-web bash`. **Node:** the Docker host. **Artifact:** study/extend `infra/lab/docker-compose.yml`; add a service.
+> Reference solution (after you try): `docs/learning/reference-solutions/` (gitignored answer key).
+
 **Goal:** Build a `compose.yaml` for a small multi-service stack: an app
 (can be a trivial script/web server) + a database, with proper networking,
 named volumes, and healthchecks.

@@ -175,6 +175,10 @@ transfer almost 1:1, and knowing both is a resume plus.
 
 ## Step 4 — Hands-On Task (build this yourself)
 
+> ▶ **Do this on the lab**: start the environment first — `./infra/bootstrap.sh up` (once: `pull`), then
+> `docker exec -it naviops-web bash`. **Node:** the Docker host. **Artifact:** study/extend the images in `infra/lab/`.
+> Reference solution (after you try): `docs/learning/reference-solutions/` (gitignored answer key).
+
 **Goal:** Containerize one of your `/scripts` (e.g., `user_audit.sh` or
 `hardening_audit.sh`) using a multi-stage Dockerfile, and run it.
 

@@ -159,6 +159,10 @@ systemd-in-a-container is generally discouraged.
 
 ## Step 4 — Hands-On Task (build this yourself)
 
+> ▶ **Do this on the lab**: start the environment first — `./infra/bootstrap.sh up` (once: `pull`), then
+> `docker exec -it naviops-web bash`. **Node:** naviops-web. **Artifact:** systemctl/journalctl here; build `scripts/service_check.sh`.
+> Reference solution (after you try): `docs/learning/reference-solutions/` (gitignored answer key).
+
 **Goal:** Wrap one of your `/scripts` (e.g., `user_audit.sh` from Lesson 03/04) as a
 systemd **service** that you can start/check/inspect via `systemctl`/`journalctl` —
 and write `scripts/service_check.sh`, a health-check script that reports on a list of

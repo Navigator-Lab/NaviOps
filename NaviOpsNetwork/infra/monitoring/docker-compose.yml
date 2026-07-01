@@ -1,0 +1,54 @@
+# NaviOpsNetwork monitoring stack — the NOC dashboards (Lesson 21/22).
+# Prometheus + node-exporter + blackbox-exporter (ICMP/TCP probes) + Grafana.
+# blackbox is the network-relevant one: it pings/curls targets so you build real uptime probes.
+#
+#   ../bootstrap.sh monitoring
+#   Grafana http://localhost:3001 (admin/naviops) · Prometheus http://localhost:9091 · blackbox :9115
+
+name: naviopsnet-monitoring
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: nnet-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - promdata:/prometheus
+    ports: ["9091:9090"]
+    networks: [mon]
+    restart: unless-stopped
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: nnet-node-exporter
+    ports: ["9101:9100"]
+    networks: [mon]
+    restart: unless-stopped
+
+  blackbox:
+    image: prom/blackbox-exporter:latest
+    container_name: nnet-blackbox
+    ports: ["9115:9115"]
+    networks: [mon]
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: nnet-grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=naviops
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafanadata:/var/lib/grafana
+    ports: ["3001:3000"]
+    networks: [mon]
+    depends_on: [prometheus]
+    restart: unless-stopped
+
+networks:
+  mon: { driver: bridge }
+
+volumes:
+  promdata:
+  grafanadata:

@@ -8,9 +8,18 @@
 id_rsa*
 id_ed25519*
 *.key
+# Wazuh SIEM lab generated SSL material — private keys, never commit
+NaviOpsSec/infra/lab/config/wazuh_indexer_ssl_certs/
 
 # Private interview prep — never published (per EXP_REPORT_2026-06-11_Portfolio-Repo-Restart-and-Authenticity)
 *.private.md
+
+# Answer-key / reference solutions — kept LOCAL so the operator builds the scripts himself
+# as practice (D18). Rebuild your own at scripts/ ; these are the "check my work" copies.
+docs/learning/reference-solutions/
+# stray Python bytecode
+__pycache__/
+*.pyc
 
 # Internal Navi project-management docs — local memory only, not recruiter-facing
 # (may reference personal/strategy details). docs/learning/ (the curriculum) stays public.

@@ -1,0 +1,12 @@
+# One-time SSL cert generation for the Wazuh single-node stack.
+# Run:  docker-compose -f generate-certs.yml run --rm generator
+# Produces ./config/wazuh_indexer_ssl_certs/ used by docker-compose.yml.
+name: naviopssec-certs
+
+services:
+  generator:
+    image: wazuh/wazuh-certs-generator:0.0.2
+    hostname: wazuh-certs-generator
+    volumes:
+      - ./config/wazuh_indexer_ssl_certs/:/certificates/
+      - ./config/certs.yml:/config/certs.yml:ro

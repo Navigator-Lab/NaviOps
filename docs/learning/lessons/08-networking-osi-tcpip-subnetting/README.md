@@ -158,6 +158,10 @@ networks and the host silently can't route.
 
 ## Step 4 — Hands-On Task (build this yourself)
 
+> ▶ **Do this on the lab**: start the environment first — `./infra/bootstrap.sh up` (once: `pull`), then
+> `docker exec -it naviops-web bash`. **Node:** naviops-web + naviops-db (172.28.0.0/24). **Artifact:** `ip`/`ss` across the subnet; build `scripts/net_diag.sh`.
+> Reference solution (after you try): `docs/learning/reference-solutions/` (gitignored answer key).
+
 **Goal:** Produce `docs/networking/subnet-cheatsheet.md` — your own reference for
 CIDR/subnet math — and run a full bottom-up diagnostic on your own machine.
 

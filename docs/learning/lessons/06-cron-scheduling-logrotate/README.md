@@ -157,6 +157,10 @@ solid — the journald integration is a real operational upgrade.
 
 ## Step 4 — Hands-On Task (build this yourself)
 
+> ▶ **Do this on the lab**: start the environment first — `./infra/bootstrap.sh up` (once: `pull`), then
+> `docker exec -it naviops-web bash`. **Node:** naviops-db. **Artifact:** schedule cron + logrotate; build `scripts/backup.sh` (cron-driven).
+> Reference solution (after you try): `docs/learning/reference-solutions/` (gitignored answer key).
+
 **Goal:** Schedule `scripts/user_audit.sh` (or `service_check.sh`) to run
 automatically, **and** write `scripts/backup.sh` — a script that backs up NaviOps'
 `docs/` directory locally, with logrotate managing its logs.

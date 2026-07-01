@@ -1,0 +1,18 @@
+# Prometheus scrape config for the NaviOps NOC lab.
+# Practice: add a new target, reload, watch it appear in http://localhost:9090/targets.
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Prometheus scrapes itself (sanity target).
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Host metrics via node-exporter — CPU, memory, disk, network (the NOC "is the box healthy?" view).
+  - job_name: node
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          role: lab-host

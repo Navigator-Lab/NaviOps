@@ -1,0 +1,64 @@
+# NaviOpsNetwork routing lab — two FRR routers + two hosts across three subnets.
+#
+# Topology (configure OSPF yourself in Lesson 07/08 — that's the exercise):
+#
+#     h1 ── net_a(10.10.1.0/24) ── r1 ── core(10.0.0.0/24) ── r2 ── net_b(10.10.2.0/24) ── h2
+#
+# Goal: make h1 (10.10.1.10) ping h2 (10.10.2.10) by bringing up OSPF on r1<->r2 and setting
+# host default routes to their local router. No real gear — pure Linux/FRR, runs offline.
+#
+#   ../bootstrap.sh up      (or docker-compose up -d)
+#   docker exec -it clab-r1 vtysh          # configure the router
+#   docker exec -it clab-h1 bash           # test from a host (netshoot has ping/traceroute/tcpdump)
+
+name: naviopsnet-lab
+
+services:
+  r1:
+    image: frrouting/frr:latest
+    container_name: clab-r1
+    hostname: r1
+    cap_add: [NET_ADMIN, SYS_ADMIN]
+    sysctls:
+      - net.ipv4.ip_forward=1          # a router forwards packets between its interfaces
+    volumes:
+      - ./frr/daemons:/etc/frr/daemons:ro
+    networks:
+      net_a: { ipv4_address: 10.10.1.1 }
+      core:  { ipv4_address: 10.0.0.1 }
+
+  r2:
+    image: frrouting/frr:latest
+    container_name: clab-r2
+    hostname: r2
+    cap_add: [NET_ADMIN, SYS_ADMIN]
+    sysctls:
+      - net.ipv4.ip_forward=1
+    volumes:
+      - ./frr/daemons:/etc/frr/daemons:ro
+    networks:
+      net_b: { ipv4_address: 10.10.2.1 }
+      core:  { ipv4_address: 10.0.0.2 }
+
+  h1:
+    image: nicolaka/netshoot:latest
+    container_name: clab-h1
+    hostname: h1
+    cap_add: [NET_ADMIN]
+    command: sleep infinity          # a workstation; you drive it interactively
+    networks:
+      net_a: { ipv4_address: 10.10.1.10 }
+
+  h2:
+    image: nicolaka/netshoot:latest
+    container_name: clab-h2
+    hostname: h2
+    cap_add: [NET_ADMIN]
+    command: sleep infinity
+    networks:
+      net_b: { ipv4_address: 10.10.2.10 }
+
+networks:
+  net_a: { driver: bridge, ipam: { config: [{ subnet: 10.10.1.0/24 }] } }
+  net_b: { driver: bridge, ipam: { config: [{ subnet: 10.10.2.0/24 }] } }
+  core:  { driver: bridge, ipam: { config: [{ subnet: 10.0.0.0/24 }] } }
