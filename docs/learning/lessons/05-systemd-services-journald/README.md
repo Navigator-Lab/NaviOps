@@ -268,43 +268,45 @@ username or `%h`/`$HOME`-relative conventions where possible).
 **Q1.** What's the difference between `systemctl enable` and `systemctl start`? Give
 a scenario where you'd want one without the other.
 
-> **Your answer:**
+> **Your answer:** `enable` makes a service start automatically at boot by creating a symlink under the target directory (e.g. `WantedBy=multi-user.target`). `start` starts the service right now in the current session only. They are independent: a service can be enabled (survives reboot) but currently stopped, or started (running now) but not enabled (won't survive reboot). Example of one without the other: during a rolling deployment test I want to `start` a new version of a service to smoke-test it in the current session, but I don't `enable` it yet — if it breaks, rebooting restores the previous state. Conversely, I might `enable` a monitoring agent on a box I'm about to hand off but not `start` it yet because I want it to begin on next boot, after final config is in place. `enable --now` does both atomically.
 
 **Q2.** **Scenario:** You edited `/etc/systemd/system/myapp.service` to fix a typo in
 `ExecStart`, then ran `systemctl restart myapp` — but it's still failing the same way.
 What step did you forget, and why does it matter?
 
-> **Your answer:**
+> **Your answer:** I forgot `systemctl daemon-reload`. systemd caches all unit file definitions in memory at startup and after each reload. Editing the file on disk does not update the in-memory definition — systemd is still using the stale, cached version with the original typo. `daemon-reload` tells PID 1 to re-read all unit files from disk; only then does `restart` pick up the change. The correct sequence is: edit → `systemd-analyze verify <file>` (catch typos before they cause silent failures) → `daemon-reload` → `restart`.
 
 **Q3.** Where do you look first when a systemd service fails to start, and what
 specific command(s) would you run?
 
-> **Your answer:**
+> **Your answer:** First stop: `systemctl status <unit>` — it shows the active state, recent journal tail, PID, and exit code inline. If I need more log lines: `journalctl -u <unit> -n 50 --no-pager` (last 50 lines without a pager). For a crash loop: `journalctl -u <unit> -b` (current boot only). The exit code in the status output tells me if it's a permission issue, a missing binary, a bad config, or a scripting error. I run the exact `ExecStart` command manually as the specified `User=` to reproduce the failure outside systemd.
 
 **Q4.** Explain `Type=oneshot` vs the default service type. When is `oneshot`
 appropriate?
 
-> **Your answer:**
+> **Your answer:** The default type is `Type=simple` — systemd considers the service started as soon as `ExecStart` is launched (the process is the main process; it's expected to run continuously). `Type=oneshot` is for tasks that run, do their work, and exit — systemd waits for the process to exit before considering the unit active/done. After it exits, the unit status shows `inactive (dead)` — which is expected, not an error. `RemainAfterExit=yes` can keep it in `active` state after exit if you want `systemctl status` to show green. Appropriate for: one-shot audit scripts (like `naviops-audit.service`), initialization tasks (seed a DB schema once), or any job-style workload that isn't a long-running daemon.
 
 **Q5.** Why does `systemctl stop myapp` reliably terminate all of `myapp`'s child
 processes, when `kill <main-pid>` might not? (Hint: cgroups.)
 
-> **Your answer:**
+> **Your answer:** systemd assigns every service unit its own **cgroup** (control group) — a kernel mechanism that groups all processes belonging to that unit together. When `systemctl stop` is issued, systemd sends the stop signal (typically `SIGTERM`, then `SIGKILL` after `TimeoutStopSec`) to the **entire cgroup**, not just the main PID. Every child process, grandchild, or background worker the service spawned — regardless of whether they re-parented — lives in the same cgroup and is terminated atomically. `kill <main-pid>` only signals that one process; any workers that forked and continued running in the background are missed, causing resource leaks or zombie listeners.
 
 **Q6.** How would you view only the logs for `nginx` from the last 30 minutes, and
 follow new entries live afterward?
 
 > **Your answer:**
+> ```bash
+> journalctl -u nginx --since '30 minutes ago' -f
+> ```
+> `--since '30 minutes ago'` filters to only log entries in that window. `-f` follows new entries as they arrive (like `tail -f`). Combined, it shows the last 30 minutes of nginx logs and then tails live. To also add a priority filter (errors only): `journalctl -u nginx --since '30 minutes ago' -p err -f`.
 
 ---
 
 ## Step 7 — Reflection
 
-*(Fill in after the quiz)*
-
-- What did you learn?
-- What confused you?
-- What would you do differently?
+- **What I learned:** systemd's model — unit files as declarative service contracts, the daemon-reload requirement (because systemd caches in memory), and the cgroup-based stop mechanism — is clean and consistent once the mental model clicks. The separation of `enable` (boot persistence) from `start` (now) was the most practically useful distinction.
+- **What confused me initially:** `Type=oneshot` showing `inactive (dead)` after success looked like a failure at first. Knowing that `inactive` is correct for oneshot (it ran and exited cleanly) required re-reading the status semantics.
+- **What I'd do differently:** Run `systemd-analyze verify` before `daemon-reload` on every future unit edit — catching typos like `ExectStart` before applying them saves the confusion of "why is my change not working?" when the real issue is a silently-ignored malformed key.
 
 ---
 
@@ -344,13 +346,13 @@ follow new entries live afterward?
 
 ## Lesson Status
 
-- [ ] Hands-on task completed (Step 4)
-- [ ] Verification passed (Step 5)
-- [ ] Quiz answered + professional-answer comparisons requested (Step 6)
-- [ ] Reflection completed (Step 7)
-- [ ] Search Keywords reviewed (Step 8)
+- [x] Hands-on task completed (Step 4)
+- [x] Verification passed (Step 5)
+- [x] Quiz answered + professional-answer comparisons requested (Step 6)
+- [x] Reflection completed (Step 7)
+- [x] Search Keywords reviewed (Step 8)
 
-When complete, run the Update Protocol, then move to **Lesson 06 — Cron, Scheduled
+✅ **Lesson 05 complete — 2026-07-01.** Moving to **Lesson 06 — Cron, Scheduled
 Tasks & Log Rotation**.
 
 ---
