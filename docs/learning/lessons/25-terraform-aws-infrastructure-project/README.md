@@ -36,13 +36,11 @@ obviously lower-risk than one touching `network`), and **test** in isolation.
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "I need the same VPC+EC2+IAM pattern for dev AND staging" | A `compute` module called twice with different variables |
-| "A single 500-line `main.tf` is hard to review/understand" | Split into `modules/network`, `modules/compute`, `modules/monitoring` |
-| "How does the EC2 instance get permission to write CloudWatch metrics, without stored credentials?" | IAM role (Lesson 15) + `aws_iam_instance_profile`, attached via the `compute` module |
-| "I want this whole environment destroyable/recreatable in one command" | `terraform destroy` / `terraform apply` on the root module |
-| "Reduce NAT gateway costs for S3/DynamoDB access" | VPC Gateway Endpoints (free) for S3/DynamoDB — per [oneuptime's VPC module guide](https://oneuptime.com/blog/post/2026-02-12-terraform-aws-vpc-module/view) |
+- **"I need the same VPC+EC2+IAM pattern for dev AND staging"** — A `compute` module called twice with different variables
+- **"A single 500-line `main.tf` is hard to review/understand"** — Split into `modules/network`, `modules/compute`, `modules/monitoring`
+- **"How does the EC2 instance get permission to write CloudWatch metrics, without stored credentials?"** — IAM role (Lesson 15) + `aws_iam_instance_profile`, attached via the `compute` module
+- **"I want this whole environment destroyable/recreatable in one command"** — `terraform destroy` / `terraform apply` on the root module
+- **"Reduce NAT gateway costs for S3/DynamoDB access"** — VPC Gateway Endpoints (free) for S3/DynamoDB — per [oneuptime's VPC module guide](https://oneuptime.com/blog/post/2026-02-12-terraform-aws-vpc-module/view)
 
 ### Three-Level Depth (Lens A)
 
@@ -150,13 +148,16 @@ terraform output app_url
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Writing custom VPC/EC2 modules from scratch when community modules exist | Reinventing well-tested code, more bugs, more maintenance | Use `terraform-aws-modules/vpc/aws` and similar for common patterns; write custom modules for your org-specific patterns only |
-| Hardcoding values that should be variables (e.g., AMI ID, region) inside modules | Module can't be reused for a different environment/region | Pass region/AMI/CIDR as module input variables |
-| `user_data` scripts that do everything (install Docker, configure app, set up monitoring, harden the OS) | Unmaintainable, untested shell scripts growing without bound | Minimal `user_data` (install Docker, basic bootstrap); hand off to Ansible (Lesson 13) for configuration |
-| No `outputs.tf` exposing useful values (instance IP, ARNs) | Have to dig through `terraform state show` or the AWS console to find resource details | Define outputs for anything you'll need to reference (SSH IP, CloudWatch alarm ARNs) |
-| Mixing environments in one state file | A mistake in `dev` can accidentally affect `prod` resources tracked in the same state | Separate state files per environment (different backend `key` per environment) |
+- **Writing custom VPC/EC2 modules from scratch when community modules exist** — Reinventing well-tested code, more bugs, more maintenance
+  **Fix:** Use `terraform-aws-modules/vpc/aws` and similar for common patterns; write custom modules for your org-specific patterns only
+- **Hardcoding values that should be variables (e.g., AMI ID, region) inside modules** — Module can't be reused for a different environment/region
+  **Fix:** Pass region/AMI/CIDR as module input variables
+- **`user_data` scripts that do everything (install Docker, configure app, set up monitoring, harden the OS)** — Unmaintainable, untested shell scripts growing without bound
+  **Fix:** Minimal `user_data` (install Docker, basic bootstrap); hand off to Ansible (Lesson 13) for configuration
+- **No `outputs.tf` exposing useful values (instance IP, ARNs)** — Have to dig through `terraform state show` or the AWS console to find resource details
+  **Fix:** Define outputs for anything you'll need to reference (SSH IP, CloudWatch alarm ARNs)
+- **Mixing environments in one state file** — A mistake in `dev` can accidentally affect `prod` resources tracked in the same state
+  **Fix:** Separate state files per environment (different backend `key` per environment)
 
 ### When NOT to over-engineer
 
@@ -352,13 +353,16 @@ terraform state list   # empty
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `terraform plan` fails: module not found | Incorrect `source` path in `module` block | Confirm relative paths (`./modules/network`) match actual directory structure |
-| EC2 instance up but `docker compose ps` shows nothing | `user_data` script failed silently | SSH in, check `/var/log/cloud-init-output.log` for errors (cloud-init logs all `user_data` output) |
-| App unreachable via `curl http://<IP>/` | Security group missing port 80 inbound, or Traefik not started | Check security group rules (`compute` module); `docker compose logs traefik` |
-| CloudWatch alarms created but instance can't write custom metrics | IAM instance profile not attached, or policy insufficient | `aws sts get-caller-identity` *from the instance* (using instance metadata) should show the role; confirm `CloudWatchAgentServerPolicy` attached |
-| `terraform destroy` hangs or fails on VPC deletion | A resource (e.g., security group) still has dependencies (ENI from a not-fully-terminated instance) | Wait for instance termination to complete fully before destroying network resources; Terraform usually orders this correctly, but timing issues can occur |
+- **`terraform plan` fails: module not found** — Incorrect `source` path in `module` block
+  **Fix:** Confirm relative paths (`./modules/network`) match actual directory structure
+- **EC2 instance up but `docker compose ps` shows nothing** — `user_data` script failed silently
+  **Fix:** SSH in, check `/var/log/cloud-init-output.log` for errors (cloud-init logs all `user_data` output)
+- **App unreachable via `curl http://<IP>/`** — Security group missing port 80 inbound, or Traefik not started
+  **Fix:** Check security group rules (`compute` module); `docker compose logs traefik`
+- **CloudWatch alarms created but instance can't write custom metrics** — IAM instance profile not attached, or policy insufficient
+  **Fix:** `aws sts get-caller-identity` *from the instance* (using instance metadata) should show the role; confirm `CloudWatchAgentServerPolicy` attached
+- **`terraform destroy` hangs or fails on VPC deletion** — A resource (e.g., security group) still has dependencies (ENI from a not-fully-terminated instance)
+  **Fix:** Wait for instance termination to complete fully before destroying network resources; Terraform usually orders this correctly, but timing issues can occur
 
 ### Redaction check ✅
 

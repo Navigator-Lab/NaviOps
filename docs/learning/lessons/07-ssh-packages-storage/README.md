@@ -34,12 +34,10 @@ Three related "keep the system usable and reachable" topics:
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "Bots are hammering port 22 with password guesses" | Disable password auth, key-only, `fail2ban` |
-| "I need `htop` installed" | `apt install htop` / `dnf install htop` — handles dependencies |
-| "`/var/log` is full but `/home` has space free" | LVM: extend the `/var` logical volume into that free space |
-| "New hire needs SSH access without sharing the root password" | Per-user SSH keys + `AllowUsers` |
+- **"Bots are hammering port 22 with password guesses"** — Disable password auth, key-only, `fail2ban`
+- **"I need `htop` installed"** — `apt install htop` / `dnf install htop` — handles dependencies
+- **"`/var/log` is full but `/home` has space free"** — LVM: extend the `/var` logical volume into that free space
+- **"New hire needs SSH access without sharing the root password"** — Per-user SSH keys + `AllowUsers`
 
 ### Three-Level Depth (Lens A)
 
@@ -127,13 +125,16 @@ sudo pvs && sudo vgs && sudo lvs   # LVM layers, if in use
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Disabling password auth **before** confirming key auth works | **Total lockout** | Test key login in a 2nd session first; never close your only session while editing `sshd_config` |
-| `sudo systemctl restart sshd` without `sshd -t` first | Syntax error → sshd fails to restart → locked out (if your session drops) | Always `sshd -t` first |
-| `apt upgrade` / `dnf upgrade` without reading what's changing on a production box | Unexpected major-version jumps can break things | `apt list --upgradable` first; consider `apt-mark hold` for critical packages |
-| Letting `/var/log` or `/tmp` fill the **root** filesystem | Whole system can become unresponsive (no space for any writes, including swap) | Separate LVs for `/var`, `/tmp`, `/home` on production; monitor with `df` (Lesson 06's cron/timer) |
-| `rm -rf` to "free space" instead of finding *what's* using it | Might delete logs needed for an active incident | `du -sh` to find the actual large files/dirs first |
+- **Disabling password auth before confirming key auth works** — **Total lockout**
+  **Fix:** Test key login in a 2nd session first; never close your only session while editing `sshd_config`
+- **`sudo systemctl restart sshd` without `sshd -t` first** — Syntax error → sshd fails to restart → locked out (if your session drops)
+  **Fix:** Always `sshd -t` first
+- **`apt upgrade` / `dnf upgrade` without reading what's changing on a production box** — Unexpected major-version jumps can break things
+  **Fix:** `apt list --upgradable` first; consider `apt-mark hold` for critical packages
+- **Letting `/var/log` or `/tmp` fill the root filesystem** — Whole system can become unresponsive (no space for any writes, including swap)
+  **Fix:** Separate LVs for `/var`, `/tmp`, `/home` on production; monitor with `df` (Lesson 06's cron/timer)
+- **`rm -rf` to "free space" instead of finding *what's* using it** — Might delete logs needed for an active incident
+  **Fix:** `du -sh` to find the actual large files/dirs first
 
 ### When NOT to
 
@@ -271,13 +272,16 @@ bash -n scripts/disk_report.sh
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| Locked out of SSH after hardening | `AllowUsers` typo, or key not actually working before disabling passwords | Use VM console (not SSH) to revert `/etc/ssh/sshd_config`, restart sshd |
-| `sshd -t` reports an error | Syntax error in `sshd_config` | Fix the reported line; re-test before restarting |
-| `apt`/`dnf install` fails with dependency errors | Stale package cache | `apt update` / `dnf clean all && dnf makecache` |
-| `lvextend` succeeds but `df` doesn't show new size | Filesystem not resized after the LV | `resize2fs <lv>` (ext4) or `xfs_growfs <mount>` (xfs) |
-| `disk_report.sh` `du` step very slow | Scanning huge directory trees | Limit depth or target specific known-large dirs |
+- **Locked out of SSH after hardening** — `AllowUsers` typo, or key not actually working before disabling passwords
+  **Fix:** Use VM console (not SSH) to revert `/etc/ssh/sshd_config`, restart sshd
+- **`sshd -t` reports an error** — Syntax error in `sshd_config`
+  **Fix:** Fix the reported line; re-test before restarting
+- **`apt`/`dnf install` fails with dependency errors** — Stale package cache
+  **Fix:** `apt update` / `dnf clean all && dnf makecache`
+- **`lvextend` succeeds but `df` doesn't show new size** — Filesystem not resized after the LV
+  **Fix:** `resize2fs <lv>` (ext4) or `xfs_growfs <mount>` (xfs)
+- **`disk_report.sh` `du` step very slow** — Scanning huge directory trees
+  **Fix:** Limit depth or target specific known-large dirs
 
 ### Redaction check ✅
 

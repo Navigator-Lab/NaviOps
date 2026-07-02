@@ -30,12 +30,10 @@ ordering, and centralized logging.
 
 ### What problem it solves
 
-| Problem | systemd solution |
-|---|---|
-| "Is nginx running? Restart it if it crashed." | `systemctl status/restart nginx`, `Restart=on-failure` in the unit |
-| "Make my custom script run as a background service that survives reboot" | Write a `.service` unit, `systemctl enable` |
-| "Show me everything that happened with the database service in the last hour" | `journalctl -u postgresql --since '1 hour ago'` |
-| "This service depends on the network being up first" | `After=network-online.target` in the unit |
+- **"Is nginx running? Restart it if it crashed."** — `systemctl status/restart nginx`, `Restart=on-failure` in the unit
+- **"Make my custom script run as a background service that survives reboot"** — Write a `.service` unit, `systemctl enable`
+- **"Show me everything that happened with the database service in the last hour"** — `journalctl -u postgresql --since '1 hour ago'`
+- **"This service depends on the network being up first"** — `After=network-online.target` in the unit
 
 ### Three-Level Depth (Lens A)
 
@@ -109,13 +107,16 @@ systemd-analyze verify /etc/systemd/system/myapp.service   # validate before rel
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Editing a unit file but forgetting `daemon-reload` | systemd keeps using the **old** unit definition | Always `daemon-reload` after editing |
-| Relative paths in `ExecStart=` | Service fails to start (no shell, no `$PATH` context) | Always absolute paths (`/usr/bin/python3 /opt/app/run.py`) |
-| Running services as `root` unnecessarily | Privilege escalation risk if compromised | Set `User=`/`Group=` to a dedicated unprivileged account |
-| Confusing `enable` with `start` | "I enabled it, why isn't it running NOW?" / "I started it, why didn't it survive reboot?" | `enable --now` does both |
-| Not checking `journalctl` before re-running a failing command | Wastes time guessing | `journalctl -u <service> -n 50 --no-pager` first |
+- **Editing a unit file but forgetting `daemon-reload`** — systemd keeps using the **old** unit definition
+  **Fix:** Always `daemon-reload` after editing
+- **Relative paths in `ExecStart=`** — Service fails to start (no shell, no `$PATH` context)
+  **Fix:** Always absolute paths (`/usr/bin/python3 /opt/app/run.py`)
+- **Running services as `root` unnecessarily** — Privilege escalation risk if compromised
+  **Fix:** Set `User=`/`Group=` to a dedicated unprivileged account
+- **Confusing `enable` with `start`** — "I enabled it, why isn't it running NOW?" / "I started it, why didn't it survive reboot?"
+  **Fix:** `enable --now` does both
+- **Not checking `journalctl` before re-running a failing command** — Wastes time guessing
+  **Fix:** `journalctl -u <service> -n 50 --no-pager` first
 
 ### When NOT to use a systemd service
 
@@ -143,13 +144,11 @@ or silent failure.
 
 ## Step 3 — Alternatives
 
-| Tool | Use case |
-|---|---|
-| **systemd** (this lesson) | Standard on RHEL/AlmaLinux/Ubuntu/Debian/Fedora — the default, expected baseline |
-| **SysVinit / `/etc/init.d`** | Legacy — still found on older systems; sequential, no built-in supervision |
-| **supervisord** | Application-level process supervision, common in Docker containers (lighter than systemd inside a container) |
-| **Docker restart policies** (`restart: unless-stopped`) | Container-level equivalent of `Restart=on-failure` (Lesson 12) |
-| **systemd timers vs cron** | Timers integrate with journald logging and can depend on other units; cron is simpler and more universally known — Lesson 06 covers both |
+- **systemd (this lesson)** — Standard on RHEL/AlmaLinux/Ubuntu/Debian/Fedora — the default, expected baseline
+- **SysVinit / `/etc/init.d`** — Legacy — still found on older systems; sequential, no built-in supervision
+- **supervisord** — Application-level process supervision, common in Docker containers (lighter than systemd inside a container)
+- **Docker restart policies (`restart: unless-stopped`)** — Container-level equivalent of `Restart=on-failure` (Lesson 12)
+- **systemd timers vs cron** — Timers integrate with journald logging and can depend on other units; cron is simpler and more universally known — Lesson 06 covers both
 
 **For NaviOps:** systemd is correct and unavoidable on AlmaLinux/Ubuntu. Inside Docker
 containers (Lesson 11–12), supervisord or simple entrypoint scripts are more common —
@@ -248,12 +247,14 @@ systemctl is-active naviops-audit.service    # "inactive" after a oneshot comple
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `Failed to start ...: Unit not found` | Typo in unit filename, or didn't `daemon-reload` | Check filename matches exactly; `daemon-reload` |
-| Service starts then immediately exits with error | `ExecStart` path wrong, or script needs args/env it doesn't get under systemd | `journalctl -u <unit> -n 50` for the actual error; test the exact `ExecStart` command manually |
-| `journalctl` shows nothing for the unit | Persistent journal not configured (logs lost on reboot only — current-boot logs should still show) | `journalctl -u <unit> -b` (current boot); for persistence, `mkdir -p /var/log/journal` |
-| `Permission denied` running script under systemd | `User=` in unit doesn't have execute permission on the script | `chmod +x` the script; check ownership |
+- **`Failed to start ...: Unit not found`** — Typo in unit filename, or didn't `daemon-reload`
+  **Fix:** Check filename matches exactly; `daemon-reload`
+- **Service starts then immediately exits with error** — `ExecStart` path wrong, or script needs args/env it doesn't get under systemd
+  **Fix:** `journalctl -u <unit> -n 50` for the actual error; test the exact `ExecStart` command manually
+- **`journalctl` shows nothing for the unit** — Persistent journal not configured (logs lost on reboot only — current-boot logs should still show)
+  **Fix:** `journalctl -u <unit> -b` (current boot); for persistence, `mkdir -p /var/log/journal`
+- **`Permission denied` running script under systemd** — `User=` in unit doesn't have execute permission on the script
+  **Fix:** `chmod +x` the script; check ownership
 
 ### Redaction check ✅
 

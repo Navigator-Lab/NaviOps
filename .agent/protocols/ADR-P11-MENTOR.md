@@ -2,7 +2,7 @@
 name: ADR-P11-MENTOR
 status: Accepted
 date: 2026-06-15
-version: 1.0
+version: 1.1
 description: The senior-admin Mentor. Turns a command question — "what does this do?", "is this the right command / best practice?", "what did I do wrong and why?" — into a teach-to-mastery card that REUSES the explanation, quality, and debug protocols. NOT an incident fix-card (that's ENUM/P12) and NOT a full topic report (that's EXP/P02). Project-agnostic.
 supersedes: none
 ---
@@ -26,7 +26,8 @@ supersedes: none
   re-runs, or "applies" the command itself, and NEVER mutates the filesystem. Its only writes are
   docs/reports/mentor/*. If you catch yourself about to Bash the user's command, STOP — you have
   left MENTOR. (Inherited verbatim from ADR-P12 Rule 0 — the lesson that "declaring a teaching mode
-  does not by itself constrain tool use".)</rule>
+  does not by itself constrain tool use".) The one permitted Bash call is the Rule 6 IDE-reveal — it
+  opens the mastery card we just wrote in the current Antigravity IDE view and mutates nothing.</rule>
 </contract>
 
 ## What MENTOR Is
@@ -122,6 +123,8 @@ connecting the fix to the root cause.]
 ## Rules
 
 0. **REPORT-ONLY** (see `<rule>`): never execute/apply the command; only write `docs/reports/mentor/*`.
+   **The one allowed Bash call is the Rule 6 IDE-reveal** of the card we just wrote — not the user's
+   command, and it changes nothing on disk.
 1. **DRY — compose, don't copy.** §2 reuses ADR-P02 Phase 8; §6's web gate reuses ADR-P02 Phase 2;
    §6 reuses ADR-P07; §7 reuses ADR-P10 Step 5; §3 defers to the project_law teaching schema if
    present. MENTOR adds only the *card ordering* + the *discriminator* — nothing those files own.
@@ -135,6 +138,12 @@ connecting the fix to the root cause.]
    to master the current command. Lead with the answer; depth follows.
 5. **Persist on substance.** Save the card to `docs/reports/mentor/` (+ INDEX row) when it is a full
    mastery card or the human asks; a quick one-flag answer can stay inline.
+6. **Reveal in the IDE (last step, only when a file was persisted).** Whenever Rule 5 writes a card
+   file, reveal it in the current editor window: `.agent/bin/navi-reveal.sh "<card-path>"`
+   (agent-agnostic; self-resolves the Antigravity CLI, `-r`/reuse-window). **Best-effort and
+   non-fatal**: the script exits 0 if no editor CLI is found — the card is still the deliverable. An
+   inline-only answer (no file) has nothing to reveal, so skip it. Revealing our own artifact does not
+   breach Rule 0. (Runtime `how`: `Navi-cc.md`; universal rule: `navi.md` §4.11 + `AGENTS.md`.)
 
 ## How Other Protocols Relate to P11
 
@@ -148,6 +157,13 @@ connecting the fix to the root cause.]
 | **project_law** | If the project defines a teaching schema (depth lenses, lesson steps), §3/§8 follow it; otherwise the generic defaults here apply. Keeps this protocol project-agnostic. |
 
 ## Changelog
+- **v1.1 (2026-07-01)**: Added **Rule 6 — Reveal in the IDE**: when Rule 5 persists a mastery card,
+  run `.agent/bin/navi-reveal.sh "<card-path>"` to open it in the current editor window. Best-effort/
+  non-fatal; inline-only answers have nothing to reveal. Carved the matching exception into Rule 0 +
+  the contract `<rule>` so revealing Navi's *own* card is not read as a REPORT-ONLY breach. Mirrors
+  ENUM/P12 v1.3; mechanism is an agent-agnostic script and the *rule* is promoted to `navi.md` §4.11
+  + `AGENTS.md` — so the Antigravity/Gemini runtime reveals too, on auto-detected MENTOR (not only
+  when "mentor" is typed).
 - **v1.0 (2026-06-15)**: Created as **P11** (the clean free slot — P08/P09 are reserved
   deferred-domain protocols and P09 is wired into OPERATE routing; P11's only prior mention was the
   historical `ADR-P12:144` "P11→P12" migration note). Adopted from

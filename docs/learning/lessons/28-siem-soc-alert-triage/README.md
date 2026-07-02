@@ -34,12 +34,10 @@ scan that preceded it) gets caught and escalated while noise gets tuned away.
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| Thousands of raw alerts, most benign | A **triage workflow**: enrich → classify → severity → escalate/close |
-| Real attacks hidden in noise (alert fatigue) | **False-positive tuning** + severity rubric so signal rises |
-| Inconsistent analyst decisions | A documented **triage runbook** (every analyst triages the same alert the same way) |
-| "Is this actually an attack?" | **MITRE ATT&CK** mapping — name the technique, know the next step |
+- **Thousands of raw alerts, most benign** — A **triage workflow**: enrich → classify → severity → escalate/close
+- **Real attacks hidden in noise (alert fatigue)** — **False-positive tuning** + severity rubric so signal rises
+- **Inconsistent analyst decisions** — A documented **triage runbook** (every analyst triages the same alert the same way)
+- **"Is this actually an attack?"** — **MITRE ATT&CK** mapping — name the technique, know the next step
 
 ### Three-Level Depth (Lens A)
 

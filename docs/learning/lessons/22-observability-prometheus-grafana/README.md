@@ -34,13 +34,11 @@ doing by hand: periodically check resource metrics, alert on thresholds.
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "I have 5 servers and don't want to SSH into each to check CPU/memory/disk" | Node Exporter on each + Prometheus scraping all of them centrally |
-| "I want a visual dashboard of my infrastructure's health" | Grafana dashboards (e.g., the community "Node Exporter Full" dashboard) |
-| "Alert me if disk usage > 85% on ANY server" | Prometheus alerting rule + Alertmanager → Slack/email |
-| "I need to query 'what was CPU usage 2 hours ago when the incident started'" (Lesson 19) | Prometheus's time-series storage — historical query via PromQL |
-| "This works the same on AWS, on-prem, or my laptop" | Open-source, self-hosted, cloud-agnostic |
+- **"I have 5 servers and don't want to SSH into each to check CPU/memory/disk"** — Node Exporter on each + Prometheus scraping all of them centrally
+- **"I want a visual dashboard of my infrastructure's health"** — Grafana dashboards (e.g., the community "Node Exporter Full" dashboard)
+- **"Alert me if disk usage > 85% on ANY server"** — Prometheus alerting rule + Alertmanager → Slack/email
+- **"I need to query 'what was CPU usage 2 hours ago when the incident started'" (Lesson 19)** — Prometheus's time-series storage — historical query via PromQL
+- **"This works the same on AWS, on-prem, or my laptop"** — Open-source, self-hosted, cloud-agnostic
 
 ### Three-Level Depth (Lens A)
 
@@ -145,13 +143,16 @@ curl -s 'http://localhost:9090/api/v1/query?query=node_filesystem_avail_bytes' |
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Forgetting `rate()` on counter metrics | Graphs show ever-increasing lines (the raw counter), not meaningful rates | Always wrap counters in `rate(...)` over a time window |
-| Scrape interval too aggressive (e.g., 1s) across many targets | Prometheus storage/CPU overload | 15s default is fine for most; 30-60s for less-critical/high-count targets |
-| No alerting rules — dashboards exist but no one's watching them | Same failure mode as Lesson 18 Q1's "alarms exist but nobody confirmed the SNS subscription" — observability without action | Define alerting rules + Alertmanager routing for the metrics that matter |
-| Alert with no `for` duration | Alert fires on every transient blip — alert fatigue (same lesson as Lesson 18 Q2) | Set a `for` duration appropriate to the metric (e.g., `for: 5m` for high CPU) |
-| Using Summary instead of Histogram for latency metrics that need cross-instance aggregation | Can't compute accurate aggregate percentiles across instances | Prefer Histogram for anything you'll aggregate with `sum`/`avg` across instances |
+- **Forgetting `rate()` on counter metrics** — Graphs show ever-increasing lines (the raw counter), not meaningful rates
+  **Fix:** Always wrap counters in `rate(...)` over a time window
+- **Scrape interval too aggressive (e.g., 1s) across many targets** — Prometheus storage/CPU overload
+  **Fix:** 15s default is fine for most; 30-60s for less-critical/high-count targets
+- **No alerting rules — dashboards exist but no one's watching them** — Same failure mode as Lesson 18 Q1's "alarms exist but nobody confirmed the SNS subscription" — observability without action
+  **Fix:** Define alerting rules + Alertmanager routing for the metrics that matter
+- **Alert with no `for` duration** — Alert fires on every transient blip — alert fatigue (same lesson as Lesson 18 Q2)
+  **Fix:** Set a `for` duration appropriate to the metric (e.g., `for: 5m` for high CPU)
+- **Using Summary instead of Histogram for latency metrics that need cross-instance aggregation** — Can't compute accurate aggregate percentiles across instances
+  **Fix:** Prefer Histogram for anything you'll aggregate with `sum`/`avg` across instances
 
 ### When NOT to over-engineer
 
@@ -315,13 +316,16 @@ curl -sI localhost:3000 | head -1
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| Prometheus target shows `DOWN` for `node` job | Node Exporter not running, wrong port, or network mode mismatch in Compose | Confirm `curl localhost:9100/metrics` works on the host; check `network_mode: host` is set for node-exporter |
-| Grafana can't reach Prometheus data source | Used `localhost:9090` instead of Compose service name `prometheus` | Use `http://prometheus:9090` — Compose's embedded DNS (Lesson 12) |
-| PromQL query returns empty result | Metric name typo, or wrong label (e.g., `mountpoint="/"` doesn't match your filesystem layout) | `curl localhost:9100/metrics \| grep node_filesystem` to see actual labels available |
-| Alert never transitions to "firing" even when threshold should be crossed | `for` duration not yet elapsed, or `rule_files` not loaded (check Prometheus config reload) | Check Prometheus → Status → Configuration that `alert_rules.yml` is referenced; reload via `docker compose restart prometheus` |
-| `rate()` query returns nothing for the first few minutes | `rate()` needs at least 2 data points within the time window | Wait at least 2x the scrape interval before querying `rate()` |
+- **Prometheus target shows `DOWN` for `node` job** — Node Exporter not running, wrong port, or network mode mismatch in Compose
+  **Fix:** Confirm `curl localhost:9100/metrics` works on the host; check `network_mode: host` is set for node-exporter
+- **Grafana can't reach Prometheus data source** — Used `localhost:9090` instead of Compose service name `prometheus`
+  **Fix:** Use `http://prometheus:9090` — Compose's embedded DNS (Lesson 12)
+- **PromQL query returns empty result** — Metric name typo, or wrong label (e.g., `mountpoint="/"` doesn't match your filesystem layout)
+  **Fix:** `curl localhost:9100/metrics | grep node_filesystem` to see actual labels available
+- **Alert never transitions to "firing" even when threshold should be crossed** — `for` duration not yet elapsed, or `rule_files` not loaded (check Prometheus config reload)
+  **Fix:** Check Prometheus → Status → Configuration that `alert_rules.yml` is referenced; reload via `docker compose restart prometheus`
+- **`rate()` query returns nothing for the first few minutes** — `rate()` needs at least 2 data points within the time window
+  **Fix:** Wait at least 2x the scrape interval before querying `rate()`
 
 ### Redaction check ✅
 

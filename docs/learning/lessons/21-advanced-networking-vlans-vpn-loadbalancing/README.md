@@ -36,13 +36,11 @@ design).
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "I want my IoT devices isolated from my servers, on the same physical switch" | VLANs (802.1Q tagging) |
-| "I need to SSH into my home lab from a coffee shop without exposing port 22 to the internet" | WireGuard VPN |
-| "One server can't handle all the traffic / I need zero-downtime deploys" | Load balancer (HAProxy/Nginx) across multiple backends |
-| "How do I inspect raw application-layer traffic vs just routing it?" | Layer 4 (TCP/UDP) vs Layer 7 (HTTP-aware) load balancing |
-| "VPN access is too broad — anyone connected can reach everything" | Zero Trust / per-service access rules layered on top of the VPN |
+- **"I want my IoT devices isolated from my servers, on the same physical switch"** — VLANs (802.1Q tagging)
+- **"I need to SSH into my home lab from a coffee shop without exposing port 22 to the internet"** — WireGuard VPN
+- **"One server can't handle all the traffic / I need zero-downtime deploys"** — Load balancer (HAProxy/Nginx) across multiple backends
+- **"How do I inspect raw application-layer traffic vs just routing it?"** — Layer 4 (TCP/UDP) vs Layer 7 (HTTP-aware) load balancing
+- **"VPN access is too broad — anyone connected can reach everything"** — Zero Trust / per-service access rules layered on top of the VPN
 
 ### Three-Level Depth (Lens A)
 
@@ -154,13 +152,16 @@ echo "show stat" | sudo socat stdio /run/haproxy/admin.sock   # live backend sta
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| VLANs configured on switch but no inter-VLAN firewall rules | "Isolated" VLANs can actually reach each other freely — false sense of security | Explicit firewall rules (default-deny) between VLANs, allow only what's needed |
-| VPN configured with overly broad access (entire network reachable once connected) | A compromised VPN client/laptop = access to everything | Scope VPN routes/firewall rules to only what each user/device needs (Zero Trust principle) |
-| Load balancer with no health checks | Traffic sent to a dead backend → user-facing errors | Configure health checks (extends Lesson 12's Compose healthcheck pattern) |
-| Single load balancer, no redundancy | The load balancer itself becomes a single point of failure (Lesson 17 Q3's "single point of failure" theme, again) | Multiple LB instances + DNS/floating IP, or managed LB (AWS ALB) |
-| Choosing L7 LB when L4 would suffice (or vice versa) | Unnecessary overhead (L7 for raw TCP), or missing routing features (L4 for HTTP path-based routing) | Match LB layer to actual requirement |
+- **VLANs configured on switch but no inter-VLAN firewall rules** — "Isolated" VLANs can actually reach each other freely — false sense of security
+  **Fix:** Explicit firewall rules (default-deny) between VLANs, allow only what's needed
+- **VPN configured with overly broad access (entire network reachable once connected)** — A compromised VPN client/laptop = access to everything
+  **Fix:** Scope VPN routes/firewall rules to only what each user/device needs (Zero Trust principle)
+- **Load balancer with no health checks** — Traffic sent to a dead backend → user-facing errors
+  **Fix:** Configure health checks (extends Lesson 12's Compose healthcheck pattern)
+- **Single load balancer, no redundancy** — The load balancer itself becomes a single point of failure (Lesson 17 Q3's "single point of failure" theme, again)
+  **Fix:** Multiple LB instances + DNS/floating IP, or managed LB (AWS ALB)
+- **Choosing L7 LB when L4 would suffice (or vice versa)** — Unnecessary overhead (L7 for raw TCP), or missing routing features (L4 for HTTP path-based routing)
+  **Fix:** Match LB layer to actual requirement
 
 ### When NOT to over-engineer
 
@@ -298,13 +299,16 @@ echo "show stat" | sudo socat stdio /run/haproxy/admin.sock | cut -d, -f1,2,18  
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `wg show` shows no "latest handshake" | Firewall blocking UDP port 51820, or wrong public key/endpoint | Check security group/firewall allows UDP 51820; verify keys match (server's peer = client's public key, and vice versa) |
-| SSH over WireGuard times out but `wg show` shows a handshake | SSH daemon listening only on public interface, or firewall on lab VM blocks `10.10.0.0/24` | Confirm `sshd` listens on all interfaces (or specifically `wg0`'s IP); check local firewall rules |
-| HAProxy `-c` validation fails | Config syntax error (often indentation/missing `backend` reference) | Read the specific line number in the error; compare against HAProxy docs example syntax |
-| All traffic goes to one backend only | `balance` algorithm not set (defaults can vary), or one backend marked DOWN | Explicitly set `balance roundrobin`; check `show stat` for backend health |
-| Health check always fails (`backend marked DOWN`) | `/health` endpoint doesn't exist, or wrong port in `server` line | Verify `curl http://<backend_ip>:<port>/health` works directly first |
+- **`wg show` shows no "latest handshake"** — Firewall blocking UDP port 51820, or wrong public key/endpoint
+  **Fix:** Check security group/firewall allows UDP 51820; verify keys match (server's peer = client's public key, and vice versa)
+- **SSH over WireGuard times out but `wg show` shows a handshake** — SSH daemon listening only on public interface, or firewall on lab VM blocks `10.10.0.0/24`
+  **Fix:** Confirm `sshd` listens on all interfaces (or specifically `wg0`'s IP); check local firewall rules
+- **HAProxy `-c` validation fails** — Config syntax error (often indentation/missing `backend` reference)
+  **Fix:** Read the specific line number in the error; compare against HAProxy docs example syntax
+- **All traffic goes to one backend only** — `balance` algorithm not set (defaults can vary), or one backend marked DOWN
+  **Fix:** Explicitly set `balance roundrobin`; check `show stat` for backend health
+- **Health check always fails (`backend marked DOWN`)** — `/health` endpoint doesn't exist, or wrong port in `server` line
+  **Fix:** Verify `curl http://<backend_ip>:<port>/health` works directly first
 
 ### Redaction check ✅
 

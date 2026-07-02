@@ -34,13 +34,11 @@ infrastructure *provisioning* rather than server *configuration*.
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "How was this VPC/EC2/S3 setup actually configured? No one remembers." | It's in a `.tf` file, version-controlled |
-| "I need an identical dev/staging/prod environment" | Same `.tf` config, different variable values |
-| "Someone changed a security group manually in the console and now things are inconsistent" | `terraform plan` shows the **drift** |
-| "I want to review infrastructure changes before they happen, like a code review" | `terraform plan` output is the "diff" reviewed in a PR |
-| "Tearing down a whole learning environment to avoid AWS charges" | `terraform destroy` removes everything Terraform created, in one command |
+- **"How was this VPC/EC2/S3 setup actually configured? No one remembers."** — It's in a `.tf` file, version-controlled
+- **"I need an identical dev/staging/prod environment"** — Same `.tf` config, different variable values
+- **"Someone changed a security group manually in the console and now things are inconsistent"** — `terraform plan` shows the **drift**
+- **"I want to review infrastructure changes before they happen, like a code review"** — `terraform plan` output is the "diff" reviewed in a PR
+- **"Tearing down a whole learning environment to avoid AWS charges"** — `terraform destroy` removes everything Terraform created, in one command
 
 ### Three-Level Depth (Lens A)
 
@@ -145,13 +143,16 @@ terraform output                     # show output values (e.g., instance public
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Local state file (`terraform.tfstate`) committed to git or only on one laptop | Secrets/resource IDs in git history; lost state = Terraform "forgets" what it manages | Remote backend (S3 + DynamoDB lock), `.gitignore` state files |
-| Running `apply` without reading `plan` output first | Unintended deletions/changes to real infrastructure | Always review `plan` — especially lines showing `-` (destroy) |
-| Manually changing resources in the console that Terraform manages | Drift — next `apply` may revert your manual change unexpectedly, or `plan` shows confusing diffs | Make changes only via `.tf` + `apply`, OR `terraform import`/`refresh` if a manual change is intentional |
-| Hardcoding secrets (AWS keys) in `.tf` files | Leaked credentials in git (same risk as Lesson 15 Q4) | Use environment variables / IAM roles for credentials, never in `.tf` |
-| Massive single `main.tf` with everything in one file/module | Hard to review, hard to reuse | Split logically (`network.tf`, `compute.tf`, `variables.tf`); extract modules for repeated patterns |
+- **Local state file (`terraform.tfstate`) committed to git or only on one laptop** — Secrets/resource IDs in git history; lost state = Terraform "forgets" what it manages
+  **Fix:** Remote backend (S3 + DynamoDB lock), `.gitignore` state files
+- **Running `apply` without reading `plan` output first** — Unintended deletions/changes to real infrastructure
+  **Fix:** Always review `plan` — especially lines showing `-` (destroy)
+- **Manually changing resources in the console that Terraform manages** — Drift — next `apply` may revert your manual change unexpectedly, or `plan` shows confusing diffs
+  **Fix:** Make changes only via `.tf` + `apply`, OR `terraform import`/`refresh` if a manual change is intentional
+- **Hardcoding secrets (AWS keys) in `.tf` files** — Leaked credentials in git (same risk as Lesson 15 Q4)
+  **Fix:** Use environment variables / IAM roles for credentials, never in `.tf`
+- **Massive single `main.tf` with everything in one file/module** — Hard to review, hard to reuse
+  **Fix:** Split logically (`network.tf`, `compute.tf`, `variables.tf`); extract modules for repeated patterns
 
 ### When NOT to over-engineer
 
@@ -368,13 +369,16 @@ terraform state list   # should be empty after destroy
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `terraform init` fails: backend config error | S3 bucket/DynamoDB table for remote state don't exist yet | Create them manually first (Step 4.1) — this is the one manual prerequisite |
-| `terraform apply` fails: "InvalidAMIID.NotFound" | AMI ID is region-specific; you used an ID from a different region | `aws ec2 describe-images --owners amazon --filters "Name=name,Values=al2023-ami-*"` for your configured region |
-| `terraform plan` shows changes on every run with no `.tf` edits | Drift — something was changed manually in the console, or a resource attribute Terraform can't fully control (e.g., AWS auto-assigns a value) | `terraform plan` diff shows what's drifting; investigate before assuming it's a bug |
-| `terraform destroy` leaves orphaned resources | A resource was created outside Terraform, or manually deleted (state out of sync) | `terraform state list` to see what Terraform thinks exists; `terraform refresh` (or `plan`) to detect; manually clean up via console for anything Terraform doesn't track |
-| State lock error: "Error acquiring the state lock" | A previous `apply`/`plan` crashed without releasing the DynamoDB lock | Confirm no other process is actually running, then `terraform force-unlock <LOCK_ID>` (use carefully) |
+- **`terraform init` fails: backend config error** — S3 bucket/DynamoDB table for remote state don't exist yet
+  **Fix:** Create them manually first (Step 4.1) — this is the one manual prerequisite
+- **`terraform apply` fails: "InvalidAMIID.NotFound"** — AMI ID is region-specific; you used an ID from a different region
+  **Fix:** `aws ec2 describe-images --owners amazon --filters "Name=name,Values=al2023-ami-*"` for your configured region
+- **`terraform plan` shows changes on every run with no `.tf` edits** — Drift — something was changed manually in the console, or a resource attribute Terraform can't fully control (e.g., AWS auto-assigns a value)
+  **Fix:** `terraform plan` diff shows what's drifting; investigate before assuming it's a bug
+- **`terraform destroy` leaves orphaned resources** — A resource was created outside Terraform, or manually deleted (state out of sync)
+  **Fix:** `terraform state list` to see what Terraform thinks exists; `terraform refresh` (or `plan`) to detect; manually clean up via console for anything Terraform doesn't track
+- **State lock error: "Error acquiring the state lock"** — A previous `apply`/`plan` crashed without releasing the DynamoDB lock
+  **Fix:** Confirm no other process is actually running, then `terraform force-unlock <LOCK_ID>` (use carefully)
 
 ### Redaction check ✅
 

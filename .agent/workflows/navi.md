@@ -146,6 +146,11 @@ Also exposed as the `/find-similar` skill.
 8. Minimum code, surgical edits, no speculative complexity; state assumptions first (Karpathy / `P07`).
 9. Web research is a real tool call for RESEARCH-class EXPs (≥3 sources cited in-body).
 10. Destructive/irreversible actions: confirm first; back up before overwrite.
+11. **Reveal every report in the editor.** After writing ANY report under `docs/reports/` (EXP · PLAN ·
+    DEBUG · VERIFY · REVIEW · ENUM · MENTOR — explicit or auto-detected), reveal it as the last step:
+    `.agent/bin/navi-reveal.sh "<report-path>"` (best-effort, non-fatal; opens the file you just wrote
+    in the current window). This mutates nothing, so it is the one action REPORT-ONLY modes still take.
+    The per-runtime *how* lives in the adapter (e.g. `Navi-cc.md`); the *rule* is universal here.
 
 ## 5. Onboarding ANY new project (the overlay)
 

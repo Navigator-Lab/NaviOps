@@ -210,26 +210,24 @@ the exact missing link yourself — that's the goal before moving to the fix.
 
 ## Glossary — Full List (Quick Reference)
 
-| Term | Meaning |
-|---|---|
-| `git remote` | Local config mapping a short name (e.g. `origin`) to a repo URL |
-| `origin` | Conventional name for the primary remote |
-| `git remote add <name> <url>` | Register a new remote (errors if name exists) |
-| `git remote set-url <name> <url>` | Change an existing remote's URL |
-| `git remote -v` | List remotes with their fetch/push URLs (read-only) |
-| SSH URL (`git@host:org/repo.git`) | scp-like shorthand; auth via SSH key |
-| HTTPS URL (`https://host/org/repo.git`) | Auth via username/token, not SSH key |
-| Private key (`id_*`, no extension) | Secret half of a key pair; must be `600` |
-| Public key (`id_*.pub`) | Shareable half; uploaded to GitHub |
-| `ssh -i <file>` | Force SSH to use a specific private key |
-| `ssh -T git@github.com` | GitHub's official "test my SSH auth" command |
-| "Permission denied (publickey)" | SSH server rejected all offered keys |
-| "Could not resolve hostname" | DNS lookup of the given name failed (pre-auth) |
-| `ssh-agent` | Background process caching unlocked private keys |
-| `ssh-add -l` | List keys currently loaded in the agent |
-| `~/.ssh/config` | Per-host SSH client config (e.g. `IdentityFile`, `Host` aliases) |
-| `ssh-keygen -lf <file>` | Print a key's fingerprint |
-| Key fingerprint | Short hash identifying a key pair, used to match local↔remote |
+- **`git remote`** — Local config mapping a short name (e.g. `origin`) to a repo URL
+- **`origin`** — Conventional name for the primary remote
+- **`git remote add <name> <url>`** — Register a new remote (errors if name exists)
+- **`git remote set-url <name> <url>`** — Change an existing remote's URL
+- **`git remote -v`** — List remotes with their fetch/push URLs (read-only)
+- **SSH URL (`git@host:org/repo.git`)** — scp-like shorthand; auth via SSH key
+- **HTTPS URL (`https://host/org/repo.git`)** — Auth via username/token, not SSH key
+- **Private key (`id_*`, no extension)** — Secret half of a key pair; must be `600`
+- **Public key (`id_*.pub`)** — Shareable half; uploaded to GitHub
+- **`ssh -i <file>`** — Force SSH to use a specific private key
+- **`ssh -T git@github.com`** — GitHub's official "test my SSH auth" command
+- **"Permission denied (publickey)"** — SSH server rejected all offered keys
+- **"Could not resolve hostname"** — DNS lookup of the given name failed (pre-auth)
+- **`ssh-agent`** — Background process caching unlocked private keys
+- **`ssh-add -l`** — List keys currently loaded in the agent
+- **`~/.ssh/config`** — Per-host SSH client config (e.g. `IdentityFile`, `Host` aliases)
+- **`ssh-keygen -lf <file>`** — Print a key's fingerprint
+- **Key fingerprint** — Short hash identifying a key pair, used to match local↔remote
 
 ---
 

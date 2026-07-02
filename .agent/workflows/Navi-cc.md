@@ -3,7 +3,8 @@ description: Navi Claude Code Adapter (v27) — project-agnostic tool mappings +
 ---
 
 # Navi-cc.md — Claude Code Compatibility Layer
-**Version**: 7.0 (project-agnostic) | **Parent**: `.agent/workflows/navi.md` (v27)
+**Version**: 7.1 (project-agnostic) | **Parent**: `.agent/workflows/navi.md` (v27)
+> v7.1 (2026-07-01): added the **Reveal report in Antigravity IDE** mechanism (single source) — ENUM/MENTOR open their card in the current IDE view after writing it.
 **Purpose**: Translate Navi protocol actions into concise Claude Code tool usage, for any project.
 
 ## Tool Mapping
@@ -19,6 +20,7 @@ description: Navi Claude Code Adapter (v27) — project-agnostic tool mappings +
 | edit file | `Edit` | prefer for existing files |
 | web research | `WebSearch` / `WebFetch` | **required in EXP Phase 2 for EVERY EXP** (P02 v27.1): RESEARCH ≥3 sources, local/debug/audit ≥2 |
 | heavy isolated work | `Agent` (subagent) | `navi-research` (EXP Phase 2) · `navi-audit` (P04+P07) · `navi-debug` (P10) — defined in `.claude/agents/` |
+| reveal report in IDE | `Bash: antigravity-ide -r <abs>` | open the just-written report in the **current** Antigravity IDE view — best-effort, non-fatal (see §Reveal report in Antigravity IDE) |
 | notify user | respond in chat | no separate notifier |
 
 ## Canonical Roots
@@ -75,6 +77,36 @@ WebSearch("[TOPIC] pitfalls / failure modes")
 Write "$REPORTS/EXP/EXP_REPORT_[DATE]_[TOPIC].md"
 Write "$REPORTS/PLAN/PLAN_REPORT_[DATE]_[TOPIC].md"
 ```
+
+## Reveal report in Antigravity IDE (single source of the "open in view" mechanism)
+
+The host editor is **Antigravity IDE** (a VS Code fork; its CLI is the standard `code`-style
+wrapper). After a protocol finishes writing a report, open that file in the **active** IDE window
+so the human sees it in view immediately instead of hunting for the path. **Required for ENUM (P12)
+and MENTOR (P11)** after they save their card; recommended for every EXP/PLAN/DEBUG/VERIFY/REVIEW
+report write.
+
+Run **once, after the file is written** (and after the INDEX row, for ENUM/MENTOR) — call the
+agent-agnostic reveal script (the single canonical entrypoint; it self-resolves the Antigravity CLI
+and reveals with `-r`/reuse-window):
+
+```bash
+Bash: .agent/bin/navi-reveal.sh "$REPORT_PATH"
+```
+
+The script (`.agent/bin/navi-reveal.sh`) resolves the editor CLI (`NAVI_IDE_BIN` override → PATH →
+`/opt/antigravity-ide/bin/antigravity-ide`) and reveals in the current window; it exits 0 if no CLI
+is found. Same script is invoked by non-CC runtimes (Antigravity/Gemini) via `AGENTS.md`.
+
+**Rules for the reveal call:**
+- **Best-effort, non-fatal.** The report file is the deliverable; the reveal is a convenience. If
+  the binary is missing or the open fails, swallow it (`|| true`) — never error the protocol.
+- **`-r` (reuse-window), never a bare open** — reveal in the current view; do not spawn a new
+  window. Add `-g "$REPORT_PATH:1"` only if you also want the cursor placed.
+- **This is a reveal of *our own artifact*, not an action on the user's system.** It reads/opens a
+  file Navi just wrote; it mutates nothing. It is therefore an explicit, allowed exception to the
+  REPORT-ONLY guardrails in P11/P12 — those still forbid Bash-ing the *user's* command.
+- One reveal per report; do not re-open on every edit.
 
 ## Model Routing
 

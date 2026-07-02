@@ -37,13 +37,11 @@ updates** (replace pods gradually), and **scheduling** (place pods on healthy no
 
 ### What problem it solves
 
-| Problem | Kubernetes solution |
-|---|---|
-| A container crashes at 3am and nobody's awake | The controller notices observed ≠ desired and recreates it automatically |
-| One host can't handle the load | The scheduler spreads replicas across many nodes |
-| "Deploy the new version without downtime" | Rolling update: new pods come up, old ones drain, traffic shifts when ready |
-| Pods keep changing IPs as they restart | A Service gives a stable name/IP; clients never chase pod IPs |
-| "It works in Compose but we have 40 services on 12 servers" | Declarative manifests + a scheduler replace hand-placed `docker run`s |
+- **A container crashes at 3am and nobody's awake** — The controller notices observed ≠ desired and recreates it automatically
+- **One host can't handle the load** — The scheduler spreads replicas across many nodes
+- **"Deploy the new version without downtime"** — Rolling update: new pods come up, old ones drain, traffic shifts when ready
+- **Pods keep changing IPs as they restart** — A Service gives a stable name/IP; clients never chase pod IPs
+- **"It works in Compose but we have 40 services on 12 servers"** — Declarative manifests + a scheduler replace hand-placed `docker run`s
 
 ### Three-Level Depth (Lens A)
 
@@ -114,14 +112,18 @@ kubectl scale deploy/web --replicas=5 # scale out
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| No resource **requests/limits** | One runaway pod starves ~30 others on the node; scheduler can't place well | Set requests + limits on every container ([source](https://learnkube.com/production-best-practices)) |
-| No **readiness** probe | A still-booting or broken pod receives live traffic → user-facing errors | Add a readiness probe to every network-facing workload |
-| Treating Pods as pets (`kubectl run` by hand) | No self-healing; gone on node failure | Always use a Deployment (declarative, replicated) |
-| `latest` image tag | Non-reproducible rollouts/rollbacks | Pin a real version tag |
-| Editing live objects with `kubectl edit` | Drift from your git manifests | Change the YAML in git, `kubectl apply` (GitOps) |
-| Running privileged / as root | Container escape risk on the *node* | Pod Security `restricted`, drop caps, non-root (Lens E) |
+- **No resource requests/limits** — One runaway pod starves ~30 others on the node; scheduler can't place well
+  **Fix:** Set requests + limits on every container ([source](https://learnkube.com/production-best-practices))
+- **No readiness probe** — A still-booting or broken pod receives live traffic → user-facing errors
+  **Fix:** Add a readiness probe to every network-facing workload
+- **Treating Pods as pets (`kubectl run` by hand)** — No self-healing; gone on node failure
+  **Fix:** Always use a Deployment (declarative, replicated)
+- **`latest` image tag** — Non-reproducible rollouts/rollbacks
+  **Fix:** Pin a real version tag
+- **Editing live objects with `kubectl edit`** — Drift from your git manifests
+  **Fix:** Change the YAML in git, `kubectl apply` (GitOps)
+- **Running privileged / as root** — Container escape risk on the *node*
+  **Fix:** Pod Security `restricted`, drop caps, non-root (Lens E)
 
 ### When NOT to use Kubernetes
 
@@ -151,14 +153,12 @@ responsible at each step rather than treating k8s as one black box.
 
 ## Step 3 — Alternatives
 
-| Tool | Use case |
-|---|---|
-| **Kubernetes** (this lesson) | Industry standard for orchestration at scale; what most cloud/DevOps JDs name |
-| **Docker Compose** (L24) | Single-host multi-container — dev environments and small deployments; no self-healing across nodes |
-| **Docker Swarm** | Simpler built-in orchestrator; far smaller ecosystem, largely superseded by k8s |
-| **HashiCorp Nomad** | Lighter scheduler; orchestrates containers *and* non-container workloads; smaller footprint |
-| **AWS ECS / Fargate** | AWS-native orchestration; less portable but much less to operate (ties to L16/L30) |
-| **Managed k8s — EKS / AKS / GKE** | Real Kubernetes with the control plane operated *for* you — the common production choice |
+- **Kubernetes (this lesson)** — Industry standard for orchestration at scale; what most cloud/DevOps JDs name
+- **Docker Compose (L24)** — Single-host multi-container — dev environments and small deployments; no self-healing across nodes
+- **Docker Swarm** — Simpler built-in orchestrator; far smaller ecosystem, largely superseded by k8s
+- **HashiCorp Nomad** — Lighter scheduler; orchestrates containers *and* non-container workloads; smaller footprint
+- **AWS ECS / Fargate** — AWS-native orchestration; less portable but much less to operate (ties to L16/L30)
+- **Managed k8s — EKS / AKS / GKE** — Real Kubernetes with the control plane operated *for* you — the common production choice
 
 **For NaviOps:** learn the concepts on a **local single-node cluster** (`kind`/`minikube`), then
 know that in a job you'll almost always use **managed** k8s (EKS on AWS — ties to your L15–18 AWS
@@ -249,14 +249,18 @@ kubectl get pods -l app=web                    # replacements already appearing 
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| Pod `Pending` | Scheduler can't place it — node lacks the requested cpu/memory, or a taint blocks it | `kubectl describe pod <p>` → read **Events**; lower requests or add a node |
-| `ImagePullBackOff` | Wrong image name/tag, or private registry needs creds | Fix the image ref; add an `imagePullSecret` |
-| `CrashLoopBackOff` | App exits on start (missing env/secret, bad config) | `kubectl logs <pod> --previous` — read the actual error |
-| Pod `Running` but `READY 0/1` | Readiness probe failing | `kubectl describe pod` → probe events; check path/port |
-| `curl` to Service fails | Service `selector` doesn't match pod `labels`, or wrong `targetPort` | `kubectl get endpoints web` — empty = selector mismatch |
-| `kubectl` `connection refused` | No cluster / wrong context | `kubectl config current-context`; `kind get clusters` |
+- **Pod `Pending`** — Scheduler can't place it — node lacks the requested cpu/memory, or a taint blocks it
+  **Fix:** `kubectl describe pod <p>` → read **Events**; lower requests or add a node
+- **`ImagePullBackOff`** — Wrong image name/tag, or private registry needs creds
+  **Fix:** Fix the image ref; add an `imagePullSecret`
+- **`CrashLoopBackOff`** — App exits on start (missing env/secret, bad config)
+  **Fix:** `kubectl logs <pod> --previous` — read the actual error
+- **Pod `Running` but `READY 0/1`** — Readiness probe failing
+  **Fix:** `kubectl describe pod` → probe events; check path/port
+- **`curl` to Service fails** — Service `selector` doesn't match pod `labels`, or wrong `targetPort`
+  **Fix:** `kubectl get endpoints web` — empty = selector mismatch
+- **`kubectl` `connection refused`** — No cluster / wrong context
+  **Fix:** `kubectl config current-context`; `kind get clusters`
 
 ### Redaction check ✅
 

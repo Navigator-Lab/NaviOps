@@ -34,12 +34,10 @@ AWS depth into "can work in an Azure shop" — multi-cloud-aware engineers comma
 
 ### What problem it solves
 
-| Problem | Azure-bridge solution |
-|---|---|
-| "This great role is an Azure shop and I only know AWS" | The concepts map directly — you learn names + `az`, not cloud from zero |
-| "Where's the 'account' in Azure?" | Subscription (billing/isolation) + Resource Group (lifecycle), not one flat account |
-| "How do I do IAM here?" | Entra ID (authn) + Azure RBAC role assignments (authz) |
-| "Do I have to relearn Terraform?" | No — same Terraform, swap the `aws` provider for `azurerm` |
+- **"This great role is an Azure shop and I only know AWS"** — The concepts map directly — you learn names + `az`, not cloud from zero
+- **"Where's the 'account' in Azure?"** — Subscription (billing/isolation) + Resource Group (lifecycle), not one flat account
+- **"How do I do IAM here?"** — Entra ID (authn) + Azure RBAC role assignments (authz)
+- **"Do I have to relearn Terraform?"** — No — same Terraform, swap the `aws` provider for `azurerm`
 
 ### Three-Level Depth (Lens A)
 
@@ -116,13 +114,16 @@ az group delete -n navi-rg --yes --no-wait          # delete the RG = delete eve
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Confusing **Entra ID** (authn) with **Azure RBAC** (authz) | "I added them to the directory but they still can't do anything" | Directory membership ≠ permissions; create an RBAC **role assignment** at a scope |
-| Forgetting which **subscription** you're in | Resources land in the wrong place / wrong bill | `az account show`; `az account set --subscription <id>` |
-| **Resource Group sprawl** | Ungrouped resources, no clean teardown | One RG per environment/app lifecycle |
-| Leaving resources running | Free-credit burn | `az group delete` nightly; budget alert |
-| Not setting `principalType` in IaC role assignments | Intermittent deploy failures (esp. service principals/MIs) | Set it explicitly ([source](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/scenarios-rbac)) |
+- **Confusing Entra ID (authn) with Azure RBAC (authz)** — "I added them to the directory but they still can't do anything"
+  **Fix:** Directory membership ≠ permissions; create an RBAC **role assignment** at a scope
+- **Forgetting which subscription you're in** — Resources land in the wrong place / wrong bill
+  **Fix:** `az account show`; `az account set --subscription <id>`
+- **Resource Group sprawl** — Ungrouped resources, no clean teardown
+  **Fix:** One RG per environment/app lifecycle
+- **Leaving resources running** — Free-credit burn
+  **Fix:** `az group delete` nightly; budget alert
+- **Not setting `principalType` in IaC role assignments** — Intermittent deploy failures (esp. service principals/MIs)
+  **Fix:** Set it explicitly ([source](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/scenarios-rbac))
 
 ### When NOT to reach for Azure
 
@@ -148,13 +149,11 @@ me a clean lifecycle container AWS doesn't have." Senior candidates name the *sp
 
 ## Step 3 — Alternatives
 
-| Path | Use case |
-|---|---|
-| **Stay single-cloud (AWS)** | Deepest path to a first role; correct default until landed |
-| **Azure bridge** (this lesson) | Cheap "multi-cloud aware" checkbox; required for Microsoft/gov shops |
-| **GCP as the third cloud** | Only if a target role/employer is GCP-centric |
-| **Terraform as the unifier** | One IaC skill spans all three — the highest-leverage cloud-agnostic investment |
-| **Bicep** | Azure-only native IaC; simpler onboarding *if* you're Azure-only, but no multi-cloud ([source](https://medium.com/@StackGuardian/terraforming-your-azure-a-practical-guide-to-migrating-from-bicep-to-terraform-339f3b08c5fa)) |
+- **Stay single-cloud (AWS)** — Deepest path to a first role; correct default until landed
+- **Azure bridge (this lesson)** — Cheap "multi-cloud aware" checkbox; required for Microsoft/gov shops
+- **GCP as the third cloud** — Only if a target role/employer is GCP-centric
+- **Terraform as the unifier** — One IaC skill spans all three — the highest-leverage cloud-agnostic investment
+- **Bicep** — Azure-only native IaC; simpler onboarding *if* you're Azure-only, but no multi-cloud ([source](https://medium.com/@StackGuardian/terraforming-your-azure-a-practical-guide-to-migrating-from-bicep-to-terraform-339f3b08c5fa))
 
 **For NaviOps:** keep **Terraform** as your unifier (you already know it from L25) — learn *enough*
 Bicep to read it, but don't invest deeply unless a job demands Azure-only IaC. The bridge's value
@@ -232,14 +231,18 @@ az group exists -n navi-rg                                           # 'false' =
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `az login` fails / wrong tenant | Multiple tenants/subscriptions | `az login --tenant <id>`; `az account set --subscription <id>` |
-| Can access portal but RBAC says denied | Entra membership ≠ authorization | Create a **role assignment** at the right scope |
-| Storage account name error | Name not globally unique / invalid chars | Lowercase, 3–24 chars, globally unique (hence the hash suffix) |
-| `AuthorizationFailed` in Terraform | Service principal lacks scope | Grant the SP an RBAC role at the subscription/RG |
-| NSG still blocks SSH | Rule priority/source wrong | Lower priority number = higher precedence; scope source to your IP |
-| Resources linger after "delete" | Deleted individual resources, not the RG | `az group delete` removes the whole container |
+- **`az login` fails / wrong tenant** — Multiple tenants/subscriptions
+  **Fix:** `az login --tenant <id>`; `az account set --subscription <id>`
+- **Can access portal but RBAC says denied** — Entra membership ≠ authorization
+  **Fix:** Create a **role assignment** at the right scope
+- **Storage account name error** — Name not globally unique / invalid chars
+  **Fix:** Lowercase, 3–24 chars, globally unique (hence the hash suffix)
+- **`AuthorizationFailed` in Terraform** — Service principal lacks scope
+  **Fix:** Grant the SP an RBAC role at the subscription/RG
+- **NSG still blocks SSH** — Rule priority/source wrong
+  **Fix:** Lower priority number = higher precedence; scope source to your IP
+- **Resources linger after "delete"** — Deleted individual resources, not the RG
+  **Fix:** `az group delete` removes the whole container
 
 ### Redaction check ✅
 

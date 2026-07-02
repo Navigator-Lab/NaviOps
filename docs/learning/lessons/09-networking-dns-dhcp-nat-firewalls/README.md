@@ -35,13 +35,11 @@
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "I typed `github.com` — how does my computer find its IP?" | DNS resolution chain |
-| "New laptop joins the office Wi-Fi and just works" | DHCP |
-| "100 internal servers share 1 public IP for outbound internet" | NAT (specifically PAT/masquerade) |
-| "Only allow SSH from my IP, block everything else" | Firewall rules |
-| "Website is down — is it DNS, the server, or a firewall blocking it?" | Layered diagnosis using all of the above |
+- **"I typed `github.com` — how does my computer find its IP?"** — DNS resolution chain
+- **"New laptop joins the office Wi-Fi and just works"** — DHCP
+- **"100 internal servers share 1 public IP for outbound internet"** — NAT (specifically PAT/masquerade)
+- **"Only allow SSH from my IP, block everything else"** — Firewall rules
+- **"Website is down — is it DNS, the server, or a firewall blocking it?"** — Layered diagnosis using all of the above
 
 ### Three-Level Depth (Lens A)
 
@@ -132,12 +130,14 @@ sysctl net.ipv4.ip_forward          # is this host allowed to route/forward pack
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| `ufw enable` without first allowing SSH (if remote) | **Lockout** — same risk class as Lesson 07's SSH hardening | Always `ufw allow 22/tcp` (or your actual SSH port) **before** `ufw enable` on a remote host |
-| Diagnosing "ping works but website doesn't" as a network issue | `ping` is ICMP (L3); HTTP is TCP (L4) + application (L7) — a firewall can block port 443 while allowing ICMP | Test the actual protocol/port: `curl -v https://...`, `nc -zv host 443` |
-| Assuming DNS changes are instant | DNS records are cached per their **TTL** — propagation can take minutes to hours | Check TTL with `dig`; use low TTLs before planned changes |
-| Confusing `ufw`'s "default deny" direction | `ufw default deny incoming` ≠ blocking outbound — outbound is usually allowed by default | Be explicit: `ufw default allow outgoing` / `deny incoming` as a pair, understand which direction each rule applies to |
+- **`ufw enable` without first allowing SSH (if remote)** — **Lockout** — same risk class as Lesson 07's SSH hardening
+  **Fix:** Always `ufw allow 22/tcp` (or your actual SSH port) **before** `ufw enable` on a remote host
+- **Diagnosing "ping works but website doesn't" as a network issue** — `ping` is ICMP (L3); HTTP is TCP (L4) + application (L7) — a firewall can block port 443 while allowing ICMP
+  **Fix:** Test the actual protocol/port: `curl -v https://...`, `nc -zv host 443`
+- **Assuming DNS changes are instant** — DNS records are cached per their **TTL** — propagation can take minutes to hours
+  **Fix:** Check TTL with `dig`; use low TTLs before planned changes
+- **Confusing `ufw`'s "default deny" direction** — `ufw default deny incoming` ≠ blocking outbound — outbound is usually allowed by default
+  **Fix:** Be explicit: `ufw default allow outgoing` / `deny incoming` as a pair, understand which direction each rule applies to
 
 ### When NOT to
 
@@ -245,12 +245,14 @@ dig +trace github.com | grep -E '^(\.|\;)' | head -10
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| Locked out after `ufw enable` | SSH port not allowed before enabling | Use VM console: `ufw allow 22/tcp`, `ufw reload` |
-| `dig` not found | Not installed (`dnsutils`/`bind-utils`) | `apt install dnsutils` / `dnf install bind-utils` |
-| `dig +short github.com` returns nothing | `/etc/resolv.conf` empty/misconfigured, or no internet route | Check `ip route`, `cat /etc/resolv.conf`, try `dig @8.8.8.8 github.com` to bypass local resolver |
-| `ufw status` shows rules but traffic still blocked | Rule order, or a `deny` rule earlier matches first | `ufw status numbered`; rules are evaluated in order, first match wins |
+- **Locked out after `ufw enable`** — SSH port not allowed before enabling
+  **Fix:** Use VM console: `ufw allow 22/tcp`, `ufw reload`
+- **`dig` not found** — Not installed (`dnsutils`/`bind-utils`)
+  **Fix:** `apt install dnsutils` / `dnf install bind-utils`
+- **`dig +short github.com` returns nothing** — `/etc/resolv.conf` empty/misconfigured, or no internet route
+  **Fix:** Check `ip route`, `cat /etc/resolv.conf`, try `dig @8.8.8.8 github.com` to bypass local resolver
+- **`ufw status` shows rules but traffic still blocked** — Rule order, or a `deny` rule earlier matches first
+  **Fix:** `ufw status numbered`; rules are evaluated in order, first match wins
 
 ### Redaction check ✅
 

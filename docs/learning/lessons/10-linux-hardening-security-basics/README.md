@@ -39,13 +39,11 @@ brute-force.
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "A compromised web server process shouldn't be able to read SSH keys" | SELinux/AppArmor confinement |
-| "Someone changed `/etc/passwd` — who, and when?" | `auditd` rules on sensitive files |
-| "Has any system binary been tampered with?" | AIDE integrity database |
-| "This server keeps getting SYN-flooded / IP-spoofed probes" | `sysctl` network hardening |
-| "Compliance audit asks: prove your hardening baseline" | Documented checklist + tool outputs |
+- **"A compromised web server process shouldn't be able to read SSH keys"** — SELinux/AppArmor confinement
+- **"Someone changed `/etc/passwd` — who, and when?"** — `auditd` rules on sensitive files
+- **"Has any system binary been tampered with?"** — AIDE integrity database
+- **"This server keeps getting SYN-flooded / IP-spoofed probes"** — `sysctl` network hardening
+- **"Compliance audit asks: prove your hardening baseline"** — Documented checklist + tool outputs
 
 ### Three-Level Depth (Lens A)
 
@@ -139,13 +137,16 @@ systemctl list-unit-files --state=enabled
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Disabling SELinux entirely because "it's annoying" (`setenforce 0` permanently) | Removes a major defense layer; common root cause in breach post-mortems | Use `setenforce 0` (Permissive) **temporarily** to debug, check `ausearch -m avc` for denials, write/adjust policy — don't disable |
-| Treating hardening as a one-time task | Drift — new packages install services that re-enable themselves, new SUID binaries appear | Periodic re-audit (cron/timer running an audit script — Lesson 06) |
-| `sysctl` changes not persisted | Setting reverts on reboot | Edit `/etc/sysctl.d/99-hardening.conf`, then `sysctl -p` |
-| Enabling `auditd` with zero rules | Daemon runs but logs nothing useful | Add explicit `-w /etc/passwd -p wa -k passwd_changes` style rules |
-| Confusing AppArmor "complain" mode with "enforce" | Mode only **logs** violations, doesn't block them — false sense of security | `aa-enforce` the relevant profiles |
+- **Disabling SELinux entirely because "it's annoying" (`setenforce 0` permanently)** — Removes a major defense layer; common root cause in breach post-mortems
+  **Fix:** Use `setenforce 0` (Permissive) **temporarily** to debug, check `ausearch -m avc` for denials, write/adjust policy — don't disable
+- **Treating hardening as a one-time task** — Drift — new packages install services that re-enable themselves, new SUID binaries appear
+  **Fix:** Periodic re-audit (cron/timer running an audit script — Lesson 06)
+- **`sysctl` changes not persisted** — Setting reverts on reboot
+  **Fix:** Edit `/etc/sysctl.d/99-hardening.conf`, then `sysctl -p`
+- **Enabling `auditd` with zero rules** — Daemon runs but logs nothing useful
+  **Fix:** Add explicit `-w /etc/passwd -p wa -k passwd_changes` style rules
+- **Confusing AppArmor "complain" mode with "enforce"** — Mode only **logs** violations, doesn't block them — false sense of security
+  **Fix:** `aa-enforce` the relevant profiles
 
 ### When NOT to
 
@@ -266,12 +267,14 @@ sudo lynis audit system | tail -30
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `sysctl` change doesn't persist after reboot | Set with `sysctl -w` only (runtime), not in `/etc/sysctl.d/` | Add to `/etc/sysctl.d/99-hardening.conf`, run `sysctl -p` |
-| `getenforce` returns `Disabled` | SELinux disabled at boot (`/etc/selinux/config` or kernel cmdline) | Set `SELINUX=permissive` first, test, then `enforcing` after reboot |
-| App breaks after enabling SELinux enforcing | Policy doesn't allow the app's normal behavior | `ausearch -m avc -ts recent`, use `audit2allow` to generate a policy module — don't just disable SELinux |
-| `auditctl -l` shows no rules after reboot | Rules added with `auditctl` directly are **not persistent** | Add rules to `/etc/audit/rules.d/*.rules` |
+- **`sysctl` change doesn't persist after reboot** — Set with `sysctl -w` only (runtime), not in `/etc/sysctl.d/`
+  **Fix:** Add to `/etc/sysctl.d/99-hardening.conf`, run `sysctl -p`
+- **`getenforce` returns `Disabled`** — SELinux disabled at boot (`/etc/selinux/config` or kernel cmdline)
+  **Fix:** Set `SELINUX=permissive` first, test, then `enforcing` after reboot
+- **App breaks after enabling SELinux enforcing** — Policy doesn't allow the app's normal behavior
+  **Fix:** `ausearch -m avc -ts recent`, use `audit2allow` to generate a policy module — don't just disable SELinux
+- **`auditctl -l` shows no rules after reboot** — Rules added with `auditctl` directly are **not persistent**
+  **Fix:** Add rules to `/etc/audit/rules.d/*.rules`
 
 ### Redaction check ✅
 
