@@ -29,12 +29,10 @@ So **Docker is the tool that gives you disposable, isolated practice servers.** 
 
 Forget the jargon for a minute. Docker has **four nouns**. Learn these four and everything else clicks.
 
-| Docker word | Plain-English analogy | In your lab |
-|---|---|---|
-| **Image** | A *recipe* / a frozen template of a machine | `jrei/systemd-ubuntu:22.04` — a frozen Ubuntu server |
-| **Container** | A *running machine* made from that recipe | `naviops-web`, `naviops-db` — your two practice servers |
-| **Volume** | A *USB drive* you plug in so data survives | `naviops-web-data` — keeps `/srv` even after you delete the container |
-| **Network** | A *virtual switch/LAN* cabling machines together | `172.28.0.0/24` — the lab's private network |
+- **Image** — a *recipe* / a frozen template of a machine. **In your lab:** `jrei/systemd-ubuntu:22.04`, a frozen Ubuntu server.
+- **Container** — a *running machine* made from that recipe. **In your lab:** `naviops-web`, `naviops-db` — your two practice servers.
+- **Volume** — a *USB drive* you plug in so data survives. **In your lab:** `naviops-web-data`, keeps `/srv` even after you delete the container.
+- **Network** — a *virtual switch/LAN* cabling machines together. **In your lab:** `172.28.0.0/24`, the lab's private network.
 
 ### The key idea: image vs container
 
@@ -131,15 +129,13 @@ Bash script that wraps the two Compose stacks so **you never have to remember pa
 `bootstrap.sh` figures out whether you have `docker compose` (new) or `docker-compose` (old), then
 `cd`s into the right folder and runs Compose for you. The mapping:
 
-| You type | It really runs | In plain English |
-|---|---|---|
-| `pull` | `docker compose pull` in `lab/` **and** `monitoring/` | Download every recipe (image) once |
-| `up` | `docker compose up -d` in `lab/` | Start web+db in the background (`-d` = detached) |
-| `monitoring` | `docker compose up -d` in `monitoring/` | Start the dashboards |
-| `all` | both `up -d` | Everything |
-| `status` | `docker compose ps` in both + prints URLs | "what's alive?" |
-| `down` | `docker compose down` | Stop & remove containers, **keep volumes** |
-| `destroy` | `docker compose down -v` | Same, but `-v` also deletes volumes (your data) |
+- **`pull`** → runs `docker compose pull` in `lab/` **and** `monitoring/` — downloads every recipe (image) once.
+- **`up`** → `docker compose up -d` in `lab/` — starts web+db in the background (`-d` = detached).
+- **`monitoring`** → `docker compose up -d` in `monitoring/` — starts the dashboards.
+- **`all`** → both `up -d` — everything.
+- **`status`** → `docker compose ps` in both + prints the URLs — "what's alive?".
+- **`down`** → `docker compose down` — stops & removes containers, **keeps volumes**.
+- **`destroy`** → `docker compose down -v` — same, but `-v` also **deletes volumes** (your data).
 
 The single most important distinction here:
 
@@ -328,15 +324,13 @@ exit
 
 ## Part 8 — When it goes wrong (beginner troubleshooting)
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `Cannot connect to the Docker daemon` | Docker isn't running | Start Docker (`sudo systemctl start docker`), or your Docker Desktop |
-| `permission denied ... docker.sock` | Your user isn't in the `docker` group | `sudo usermod -aG docker $USER` then log out/in (or use `sudo`) |
-| `bind: address already in use` on 3000/8080/9090 | Another program owns that port | Stop the other program, or change the left (host) number in the compose `ports` |
-| `bootstrap.sh` says compose not found | Docker/Compose not installed | Install Docker Engine + the Compose plugin |
-| Container keeps restarting / exits | Bad config inside it | `docker logs <name>` — read the actual error (see Lesson 11 Task 2) |
-| Everything's weird after lots of tinkering | Accumulated cruft | `./infra/bootstrap.sh destroy && ./infra/bootstrap.sh up` — fresh start |
-| `pull` fails | No internet (and images not cached yet) | The *first* `pull` needs internet once; after that you're offline-capable |
+- **`Cannot connect to the Docker daemon`** — Docker isn't running. → Start it: `sudo systemctl start docker` (or launch Docker Desktop).
+- **`permission denied ... docker.sock`** — your user isn't in the `docker` group. → `sudo usermod -aG docker $USER`, then log out/in (or use `sudo`).
+- **`bind: address already in use`** on 3000/8080/9090 — another program owns that port. → Stop it, or change the left (host) number in the compose `ports`.
+- **`bootstrap.sh` says compose not found** — Docker/Compose isn't installed. → Install Docker Engine + the Compose plugin.
+- **Container keeps restarting / exits** — bad config inside it. → `docker logs <name>` to read the actual error (see Lesson 11 Task 2).
+- **Everything's weird after lots of tinkering** — accumulated cruft. → `./infra/bootstrap.sh destroy && ./infra/bootstrap.sh up` for a fresh start.
+- **`pull` fails** — no internet (and images not cached yet). → The *first* `pull` needs internet once; after that you're offline-capable.
 
 **Golden rule while learning:** if a container is confusing you, you can almost always
 `destroy` + `up` for a clean slate. That fearlessness is the whole point of a disposable lab —
@@ -389,10 +383,11 @@ your first real task inside `naviops-web`.
 > **The single most important idea first:** there are **two places** you work, and mixing them up is
 > what makes Lesson 06 confusing.
 >
-> | Marker | Where | What you do there | Why |
-> |---|---|---|---|
-> | **[HOST]** | your real machine, in `/home/sys-ctl/NaviOps` | **write + test the script** `scripts/backup.sh` | it's a real NaviOps artifact you commit to git |
-> | **[LAB]** | inside `docker exec -it naviops-web bash` | **practice cron / systemd timers / logrotate** | installing/breaking schedulers is safe in a disposable container — never touch your real machine's cron |
+> - **[HOST]** — your real machine, in `/home/sys-ctl/NaviOps`. There you **write + test the script**
+>   `scripts/backup.sh` — because it's a real NaviOps artifact you commit to git.
+> - **[LAB]** — inside `docker exec -it naviops-web bash`. There you **practice cron / systemd timers /
+>   logrotate** — because installing or breaking schedulers is safe in a disposable container; you never
+>   touch your real machine's cron.
 >
 > Every command below is tagged **[HOST]** or **[LAB]**. That tag *is* the lesson.
 
