@@ -2,7 +2,7 @@
 name: ADR-P12-ENUM
 status: Accepted
 date: 2026-06-12
-version: 1.2
+version: 1.3
 description: Error & Incident Enumeration. A surgical 5-section incident fix-card for real-world terminal errors — the Lite-tier specialization of the fast-path. NOT an explanation (EXP). Project-agnostic.
 supersedes: enum-protocol.md (root draft)
 ---
@@ -14,7 +14,7 @@ supersedes: enum-protocol.md (root draft)
   <trigger>"enum"/"ENUM" explicitly; or a raw terminal error with a known, deterministic fix (auto-detect ≥0.8). See §When to Trigger and the ENUM-vs-DEBUG discriminator.</trigger>
   <reads>ADR-P00 (anchor) · the detected project_law</reads>
   <output>docs/reports/enum/ENUM_YYYY-MM-DD_short-slug.md (5 sections) + one row in docs/reports/enum/INDEX.md</output>
-  <rule>ENUM is REPORT-ONLY: it writes the incident card and NEVER executes, re-runs, or "fixes" the user's command. Section 4 hands the corrected command to the user to paste. ENUM never runs the 7-phase EXP cycle. Tier is always Lite. WebSearch only if root cause is genuinely ambiguous.</rule>
+  <rule>ENUM is REPORT-ONLY: it writes the incident card and NEVER executes, re-runs, or "fixes" the user's command. Section 4 hands the corrected command to the user to paste. ENUM never runs the 7-phase EXP cycle. Tier is always Lite. WebSearch only if root cause is genuinely ambiguous. The single permitted Bash call is the IDE-reveal in Rule 6 — it opens the card we just wrote in the current Antigravity IDE view and mutates nothing.</rule>
 </contract>
 
 ## What ENUM Is
@@ -103,6 +103,9 @@ Create `docs/reports/enum/` if it doesn't exist (same first-touch scaffolding pa
 Optional **## 6. Note** — only if the fix alone is not self-explanatory. Max 4 lines.
 Never add it just to pad the card.
 
+**After the file is saved and the INDEX row appended, reveal it in the IDE** (Rule 6): open the
+card in the current Antigravity IDE window so the human sees it in view immediately.
+
 ---
 
 ## Rules
@@ -111,6 +114,8 @@ Never add it just to pad the card.
    or apply the command, and do NOT mutate the user's filesystem. Your only writes are
    `docs/reports/enum/*`. If you catch yourself about to call `Bash` on the user's command,
    STOP — you've left ENUM. (The user runs Section 4 themselves; that's why it's "copy-paste ready.")
+   **The one allowed Bash call is the Rule 6 IDE-reveal** — it opens the card *we* just wrote; it is
+   not the user's command and changes nothing on disk.
 1. No EXP phases — do NOT run the 7-phase EXP cycle.
 2. No WebSearch required — the error is local and the fix is deterministic.
    Use WebSearch only if root cause is genuinely ambiguous (and if it is, you are probably in
@@ -121,6 +126,12 @@ Never add it just to pad the card.
    Create INDEX.md with a table header if it doesn't exist yet.
 5. Do not merge with EXP — if the user asks "why does X work?" after an ENUM,
    open a new EXP, do not extend the card.
+6. **Reveal in the IDE (last step).** After the card is saved and the INDEX row appended, reveal it in
+   the current editor window by running `.agent/bin/navi-reveal.sh "<card-path>"` (agent-agnostic;
+   self-resolves the Antigravity CLI, `-r`/reuse-window). It is **best-effort and non-fatal**: the
+   script exits 0 if no editor CLI is found — the card is still the deliverable. This is a reveal of
+   our own artifact, so it does not breach Rule 0's REPORT-ONLY guarantee. (Runtime `how`:
+   `Navi-cc.md` §Reveal report in Antigravity IDE; universal rule: `navi.md` §4.11 + `AGENTS.md`.)
 
 ---
 
@@ -136,6 +147,13 @@ Never add it just to pad the card.
 ---
 
 ## Changelog
+- **v1.3 (2026-07-01)**: Added **Rule 6 — Reveal in the IDE**: after saving the card + INDEX row, run
+  `.agent/bin/navi-reveal.sh "<card-path>"` to open it in the current editor window. Best-effort/
+  non-fatal. Carved the matching exception into Rule 0 + the contract `<rule>` so the reveal of Navi's
+  *own* report is not mistaken for a REPORT-ONLY breach (opens our artifact, not the user's command,
+  mutates nothing). *Rev (same day):* moved the mechanism out of the CC-only adapter into an
+  agent-agnostic script + promoted the *rule* to `navi.md` §4.11 and `AGENTS.md`, so non-CC runtimes
+  (Antigravity/Gemini) reveal too and it fires for auto-detected ENUM, not only explicit "enum".
 - **v1.2 (2026-06-15)**: Added the **P11 (MENTOR)** sibling row to "How Other Protocols Relate" —
   ENUM = deterministic *fix* card, MENTOR = *teach* the command to mastery (see `ADR-P11-MENTOR.md`).
   No behavioural change to ENUM itself.
