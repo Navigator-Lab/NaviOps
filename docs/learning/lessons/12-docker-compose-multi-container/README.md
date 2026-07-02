@@ -31,13 +31,11 @@ declarative, version-controllable, and reproducible with one command.
 
 ### What problem it solves
 
-| Problem | Compose solution |
-|---|---|
-| "Run my app + Postgres + Redis together, networked" | One `compose.yaml`, `docker compose up` |
-| "New developer needs the full stack running locally" | `git clone && docker compose up` |
-| "The app starts before the database is ready and crashes" | `depends_on` with `condition: service_healthy` |
-| "I need the database data to survive container restarts" | Named volumes |
-| "Services should reach each other by name, not hardcoded IPs" | Compose's built-in DNS (service name = hostname) |
+- **"Run my app + Postgres + Redis together, networked"** — One `compose.yaml`, `docker compose up`
+- **"New developer needs the full stack running locally"** — `git clone && docker compose up`
+- **"The app starts before the database is ready and crashes"** — `depends_on` with `condition: service_healthy`
+- **"I need the database data to survive container restarts"** — Named volumes
+- **"Services should reach each other by name, not hardcoded IPs"** — Compose's built-in DNS (service name = hostname)
 
 ### Three-Level Depth (Lens A)
 
@@ -120,13 +118,16 @@ docker compose config            # validate and print the resolved config
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Relying on `depends_on` alone for "DB is ready" | App crashes on startup with "connection refused" — DB container started but Postgres hasn't finished initializing | Add `healthcheck:` to db service + `condition: service_healthy` |
-| Hardcoding `localhost` for inter-service connections | Each container has its own `localhost` — won't reach other containers | Use the **service name** as hostname (Compose DNS) |
-| Not using named volumes for databases | Data lost every `docker compose down` | Declare a named volume, mount it at the DB's data directory |
-| `docker compose down -v` on production | Deletes all persistent data | Reserve `-v` for dev/throwaway environments; never run on prod without explicit confirmation |
-| One giant `compose.yaml` with secrets hardcoded | Secrets committed to git | Use `.env` files (gitignored) + `environment:` referencing variables, or Docker secrets |
+- **Relying on `depends_on` alone for "DB is ready"** — App crashes on startup with "connection refused" — DB container started but Postgres hasn't finished initializing
+  **Fix:** Add `healthcheck:` to db service + `condition: service_healthy`
+- **Hardcoding `localhost` for inter-service connections** — Each container has its own `localhost` — won't reach other containers
+  **Fix:** Use the **service name** as hostname (Compose DNS)
+- **Not using named volumes for databases** — Data lost every `docker compose down`
+  **Fix:** Declare a named volume, mount it at the DB's data directory
+- **`docker compose down -v` on production** — Deletes all persistent data
+  **Fix:** Reserve `-v` for dev/throwaway environments; never run on prod without explicit confirmation
+- **One giant `compose.yaml` with secrets hardcoded** — Secrets committed to git
+  **Fix:** Use `.env` files (gitignored) + `environment:` referencing variables, or Docker secrets
 
 ### When NOT to use Compose
 
@@ -156,12 +157,10 @@ sibling container.
 
 ## Step 3 — Alternatives
 
-| Tool | Use case |
-|---|---|
-| **Docker Compose** (this lesson) | Single-host multi-container apps; local dev; small production deployments |
-| **Kubernetes** | Multi-host orchestration, auto-scaling, self-healing — the "next level" beyond Compose, large learning curve |
-| **Podman Compose / Quadlet** | Podman's equivalents — relevant on RHEL/Alma if avoiding the Docker daemon |
-| **systemd unit per container** (Lesson 05) | For a *single* container that needs to survive reboot without Compose's orchestration features |
+- **Docker Compose (this lesson)** — Single-host multi-container apps; local dev; small production deployments
+- **Kubernetes** — Multi-host orchestration, auto-scaling, self-healing — the "next level" beyond Compose, large learning curve
+- **Podman Compose / Quadlet** — Podman's equivalents — relevant on RHEL/Alma if avoiding the Docker daemon
+- **systemd unit per container (Lesson 05)** — For a *single* container that needs to survive reboot without Compose's orchestration features
 
 ---
 
@@ -267,13 +266,16 @@ docker compose down
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `app` exits immediately with "connection refused" to `db` | `depends_on` without healthcheck — db container started but Postgres not ready | Add `healthcheck:` + `condition: service_healthy` |
-| `app` can't resolve `db` as a hostname | Services on different networks | Ensure both services share at least one common network |
-| `.env` variables not substituted (`${DB_PASSWORD}` literally appears) | `.env` file missing or in wrong directory | `.env` must be in the same directory as `compose.yaml` |
-| Data gone after `docker compose down` | Used `-v` flag, or volume not properly declared/mounted | Remove `-v` for routine restarts; verify `volumes:` mapping |
-| `docker compose up` fails: "port already in use" | Another process/container already bound to that host port | `docker ps` to find it, or change the host-side port mapping |
+- **`app` exits immediately with "connection refused" to `db`** — `depends_on` without healthcheck — db container started but Postgres not ready
+  **Fix:** Add `healthcheck:` + `condition: service_healthy`
+- **`app` can't resolve `db` as a hostname** — Services on different networks
+  **Fix:** Ensure both services share at least one common network
+- **`.env` variables not substituted (`${DB_PASSWORD}` literally appears)** — `.env` file missing or in wrong directory
+  **Fix:** `.env` must be in the same directory as `compose.yaml`
+- **Data gone after `docker compose down`** — Used `-v` flag, or volume not properly declared/mounted
+  **Fix:** Remove `-v` for routine restarts; verify `volumes:` mapping
+- **`docker compose up` fails: "port already in use"** — Another process/container already bound to that host port
+  **Fix:** `docker ps` to find it, or change the host-side port mapping
 
 ### Redaction check ✅
 

@@ -32,12 +32,10 @@ fixing the **system** that allowed the incident, not finding someone to blame.
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "Service X is down — where do I even start?" | A runbook with a decision tree for this exact scenario |
-| "I fixed it, but I don't remember the exact commands I used last time" | Runbooks are documented, version-controlled, repeatable |
-| "We keep having the same incident every few months" | Postmortems identify root causes and produce action items |
-| "Logs from 5 different sources — where's the actual error?" | Systematic log analysis: find the **failure signature** first |
+- **"Service X is down — where do I even start?"** — A runbook with a decision tree for this exact scenario
+- **"I fixed it, but I don't remember the exact commands I used last time"** — Runbooks are documented, version-controlled, repeatable
+- **"We keep having the same incident every few months"** — Postmortems identify root causes and produce action items
+- **"Logs from 5 different sources — where's the actual error?"** — Systematic log analysis: find the **failure signature** first
 
 ### Three-Level Depth (Lens A)
 
@@ -142,13 +140,16 @@ aws logs start-query --log-group-name /naviops/app \
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Jumping to fixes before finding the failure signature | Fix the wrong thing, incident continues or recurs | Find the repeating error pattern first, then trace backward |
-| No runbook — improvising every incident | Slow, inconsistent response; tribal knowledge lost when people leave | Write runbooks for your top recurring scenarios |
-| Blame-focused postmortems | People hide mistakes/near-misses → less visibility into real risk | Blameless: focus on system/process gaps, not individuals |
-| Postmortem with no action items / no follow-up | Same incident recurs | Every postmortem produces tracked action items with owners |
-| Treating "service is back up" as "done" | Root cause not fixed — recurs later | Verification step must address root cause, not just symptom |
+- **Jumping to fixes before finding the failure signature** — Fix the wrong thing, incident continues or recurs
+  **Fix:** Find the repeating error pattern first, then trace backward
+- **No runbook — improvising every incident** — Slow, inconsistent response; tribal knowledge lost when people leave
+  **Fix:** Write runbooks for your top recurring scenarios
+- **Blame-focused postmortems** — People hide mistakes/near-misses → less visibility into real risk
+  **Fix:** Blameless: focus on system/process gaps, not individuals
+- **Postmortem with no action items / no follow-up** — Same incident recurs
+  **Fix:** Every postmortem produces tracked action items with owners
+- **Treating "service is back up" as "done"** — Root cause not fixed — recurs later
+  **Fix:** Verification step must address root cause, not just symptom
 
 ### When NOT to over-process
 
@@ -225,11 +226,12 @@ scratch.
 - Verify: `systemctl status`, `curl <health-endpoint>`, `journalctl -f` for a few minutes
 
 ## Known Failure Signatures
-| Signature | Likely Cause | Fix |
-|---|---|---|
-| `OOMKilled` / dmesg "Killed process" | Memory limit exceeded | Increase limit or fix leak; add CloudWatch memory alarm |
-| `Permission denied` on startup | File ownership/permissions changed | `chown`/`chmod` per Lesson 04 |
-| `bind: address already in use` | Port conflict / previous instance still running | `ss -tlnp` (Lesson 08) to find the conflicting process |
+- **`OOMKilled` / dmesg "Killed process"** — Memory limit exceeded
+  **Fix:** Increase limit or fix leak; add CloudWatch memory alarm
+- **`Permission denied` on startup** — File ownership/permissions changed
+  **Fix:** `chown`/`chmod` per Lesson 04
+- **`bind: address already in use`** — Port conflict / previous instance still running
+  **Fix:** `ss -tlnp` (Lesson 08) to find the conflicting process
 
 ## Postmortem template
 - **Timeline**: when detected, when contained, when resolved
@@ -276,11 +278,12 @@ free -h
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `journalctl -p err` shows nothing but service is clearly broken | Error logged at a different priority level, or to a different log entirely (app-specific log file) | Check `journalctl` without `-p` filter, and any app-specific log paths |
-| Can't reproduce the simulated incident | Fix was already applied / state reverted unexpectedly | Re-verify the "break" step actually took effect before troubleshooting |
-| Postmortem "5 Whys" stops too early (e.g., "why? - a bug" with no further whys) | Surface-level analysis | Keep asking "why did THAT happen" until you reach a process/systemic factor |
+- **`journalctl -p err` shows nothing but service is clearly broken** — Error logged at a different priority level, or to a different log entirely (app-specific log file)
+  **Fix:** Check `journalctl` without `-p` filter, and any app-specific log paths
+- **Can't reproduce the simulated incident** — Fix was already applied / state reverted unexpectedly
+  **Fix:** Re-verify the "break" step actually took effect before troubleshooting
+- **Postmortem "5 Whys" stops too early (e.g., "why? - a bug" with no further whys)** — Surface-level analysis
+  **Fix:** Keep asking "why did THAT happen" until you reach a process/systemic factor
 
 ### Redaction check ✅
 

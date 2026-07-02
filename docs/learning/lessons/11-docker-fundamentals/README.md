@@ -31,12 +31,10 @@ to boot).
 
 ### What problem it solves
 
-| Problem | Docker solution |
-|---|---|
-| "Works on my machine but not in production" | Same image runs everywhere |
-| "This app needs Python 3.11 but the server has 3.9, and another app needs 3.9" | Each app's container has its own Python version, isolated |
-| "Spinning up a full VM for a quick test is slow and heavy" | `docker run` starts in ~1 second |
-| "I need to onboard a new developer and they spend a day installing dependencies" | `docker compose up` (Lesson 12) — one command, full stack |
+- **"Works on my machine but not in production"** — Same image runs everywhere
+- **"This app needs Python 3.11 but the server has 3.9, and another app needs 3.9"** — Each app's container has its own Python version, isolated
+- **"Spinning up a full VM for a quick test is slow and heavy"** — `docker run` starts in ~1 second
+- **"I need to onboard a new developer and they spend a day installing dependencies"** — `docker compose up` (Lesson 12) — one command, full stack
 
 ### Three-Level Depth (Lens A)
 
@@ -123,13 +121,16 @@ docker system prune                  # clean up unused images/containers (carefu
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Using `latest` tag in production | Non-reproducible — "latest" can change underneath you | Pin specific version tags (`myapp:1.4.2`) |
-| Running containers as `root` (default) | If compromised, attacker has root inside the container (and potentially escapes) | `USER` directive in Dockerfile to drop to a non-root user |
-| Copying entire project (`COPY . .`) before installing dependencies | Breaks layer caching — every code change reinstalls all dependencies | Copy dependency manifests first, install, *then* copy source |
-| Not using `.dockerignore` | `.git`, `node_modules`, secrets accidentally baked into image | Add a `.dockerignore` (like `.gitignore`) |
-| Single-stage build with build tools left in final image | Large image, more CVEs | Multi-stage builds (Step 4) |
+- **Using `latest` tag in production** — Non-reproducible — "latest" can change underneath you
+  **Fix:** Pin specific version tags (`myapp:1.4.2`)
+- **Running containers as `root` (default)** — If compromised, attacker has root inside the container (and potentially escapes)
+  **Fix:** `USER` directive in Dockerfile to drop to a non-root user
+- **Copying entire project (`COPY . .`) before installing dependencies** — Breaks layer caching — every code change reinstalls all dependencies
+  **Fix:** Copy dependency manifests first, install, *then* copy source
+- **Not using `.dockerignore`** — `.git`, `node_modules`, secrets accidentally baked into image
+  **Fix:** Add a `.dockerignore` (like `.gitignore`)
+- **Single-stage build with build tools left in final image** — Large image, more CVEs
+  **Fix:** Multi-stage builds (Step 4)
 
 ### When NOT to use Docker
 
@@ -159,13 +160,11 @@ across the build *and* runtime lifecycle, not just one command.
 
 ## Step 3 — Alternatives
 
-| Tool | Use case |
-|---|---|
-| **Docker** (this lesson) | Industry-standard, huge ecosystem, what most job postings expect |
-| **Podman** | Daemonless, rootless-by-default alternative; drop-in CLI compatible with Docker (`alias docker=podman` often works) — increasingly common on RHEL/Alma (no Docker daemon needed) |
-| **containerd / CRI-O** | Lower-level container runtimes — what Kubernetes uses under the hood; you won't interact with these directly as a beginner |
-| **Virtual Machines** | Full isolation (own kernel) — needed for running different OSes or kernel-level work; heavier |
-| **Docker Compose** (Lesson 12) | For multi-container apps — single containers are rarely the whole picture |
+- **Docker (this lesson)** — Industry-standard, huge ecosystem, what most job postings expect
+- **Podman** — Daemonless, rootless-by-default alternative; drop-in CLI compatible with Docker (`alias docker=podman` often works) — increasingly common on RHEL/Alma (no Docker daemon needed)
+- **containerd / CRI-O** — Lower-level container runtimes — what Kubernetes uses under the hood; you won't interact with these directly as a beginner
+- **Virtual Machines** — Full isolation (own kernel) — needed for running different OSes or kernel-level work; heavier
+- **Docker Compose (Lesson 12)** — For multi-container apps — single containers are rarely the whole picture
 
 **For NaviOps:** Docker is the right starting point (most tutorials/jobs assume it);
 note that AlmaLinux/RHEL environments increasingly favor **Podman** — the concepts
@@ -244,13 +243,16 @@ docker run --rm --entrypoint id naviops-audit:1.0
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `docker: command not found` | Docker not installed | Install Docker Engine (or Podman) per your distro's docs |
-| `permission denied` running `docker` commands | User not in `docker` group | `sudo usermod -aG docker $USER`, log out/in (note: docker group = root-equivalent — security tradeoff) |
-| Build fails: `apk: command not found` | Used `apt`/`apk` mismatched to base image (Alpine uses `apk`, Debian/Ubuntu use `apt`) | Match package manager to base image |
-| Script fails inside container but works on host | Missing dependency (e.g., `bash` not in `alpine` by default — it has `sh`/`ash`) | Install needed packages explicitly in the Dockerfile |
-| Container exits immediately | Expected for a `oneshot`-style script (Lesson 05 parallel) — `docker ps -a` shows exit code | `docker logs <container-id>` to see output/errors |
+- **`docker: command not found`** — Docker not installed
+  **Fix:** Install Docker Engine (or Podman) per your distro's docs
+- **`permission denied` running `docker` commands** — User not in `docker` group
+  **Fix:** `sudo usermod -aG docker $USER`, log out/in (note: docker group = root-equivalent — security tradeoff)
+- **Build fails: `apk: command not found`** — Used `apt`/`apk` mismatched to base image (Alpine uses `apk`, Debian/Ubuntu use `apt`)
+  **Fix:** Match package manager to base image
+- **Script fails inside container but works on host** — Missing dependency (e.g., `bash` not in `alpine` by default — it has `sh`/`ash`)
+  **Fix:** Install needed packages explicitly in the Dockerfile
+- **Container exits immediately** — Expected for a `oneshot`-style script (Lesson 05 parallel) — `docker ps -a` shows exit code
+  **Fix:** `docker logs <container-id>` to see output/errors
 
 ### Redaction check ✅
 

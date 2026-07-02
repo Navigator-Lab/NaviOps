@@ -29,13 +29,11 @@ wiring switches/routers.
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "I need a Linux server in the cloud, on-demand" | EC2 instance |
-| "My database shouldn't be reachable from the internet, only from my app server" | Private subnet + security groups |
-| "My app server needs internet access, but the database doesn't" | Public subnet (with Internet Gateway) for app, private subnet (no IGW route) for DB |
-| "Only I should be able to SSH into my instance" | Security group: allow port 22 only from my IP |
-| "I need a second layer of network filtering at the subnet level" | NACLs (Network ACLs) |
+- **"I need a Linux server in the cloud, on-demand"** — EC2 instance
+- **"My database shouldn't be reachable from the internet, only from my app server"** — Private subnet + security groups
+- **"My app server needs internet access, but the database doesn't"** — Public subnet (with Internet Gateway) for app, private subnet (no IGW route) for DB
+- **"Only I should be able to SSH into my instance"** — Security group: allow port 22 only from my IP
+- **"I need a second layer of network filtering at the subnet level"** — NACLs (Network ACLs)
 
 ### Three-Level Depth (Lens A)
 
@@ -133,13 +131,16 @@ ssh -i ~/.ssh/my-ec2-key.pem ec2-user@<PUBLIC_IP>
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Security group allows SSH from `0.0.0.0/0` | Anyone on the internet can attempt SSH (brute-force target) | Restrict to your IP/CIDR (`<YOUR_IP>/32`) |
-| Putting a database in a public subnet | Direct internet exposure of sensitive data | Databases belong in private subnets, no IGW route |
-| Confusing "stateful" (security groups) with "stateless" (NACLs) | Forgetting outbound NACL rules for return traffic — connections mysteriously fail | Remember NACLs need explicit rules for **both directions** |
-| Launching instances outside the Free Tier (`t2.micro`/`t3.micro`) while learning | Unexpected charges (ties to Lesson 15) | Stick to Free Tier instance types; terminate instances when not in use |
-| Forgetting to terminate (not just stop) instances/resources after a lab | Stopped EBS volumes still incur storage charges | `terminate`, and check for orphaned EBS volumes/Elastic IPs |
+- **Security group allows SSH from `0.0.0.0/0`** — Anyone on the internet can attempt SSH (brute-force target)
+  **Fix:** Restrict to your IP/CIDR (`<YOUR_IP>/32`)
+- **Putting a database in a public subnet** — Direct internet exposure of sensitive data
+  **Fix:** Databases belong in private subnets, no IGW route
+- **Confusing "stateful" (security groups) with "stateless" (NACLs)** — Forgetting outbound NACL rules for return traffic — connections mysteriously fail
+  **Fix:** Remember NACLs need explicit rules for **both directions**
+- **Launching instances outside the Free Tier (`t2.micro`/`t3.micro`) while learning** — Unexpected charges (ties to Lesson 15)
+  **Fix:** Stick to Free Tier instance types; terminate instances when not in use
+- **Forgetting to terminate (not just stop) instances/resources after a lab** — Stopped EBS volumes still incur storage charges
+  **Fix:** `terminate`, and check for orphaned EBS volumes/Elastic IPs
 
 ### When NOT to over-engineer
 
@@ -236,12 +237,14 @@ aws ec2 describe-security-groups --group-ids <SG_ID> --query 'SecurityGroups[0].
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| SSH times out | Security group doesn't allow port 22 from your IP, or instance in private subnet with no route | Check security group inbound rules; confirm subnet has IGW route |
-| SSH "Permission denied (publickey)" | Wrong username for the AMI (`ec2-user` for AlmaLinux/RHEL-based, `ubuntu` for Ubuntu AMIs), or wrong key | Match username to AMI vendor; verify `.pem` file permissions (`chmod 400`) |
-| Instance launches but no public IP | Subnet's "auto-assign public IP" disabled | Enable auto-assign public IP on the subnet, or assign an Elastic IP |
-| Unexpected charge appears | Instance left running, or Elastic IP not associated with a running instance (charged when idle) | Terminate unused instances; release unassociated Elastic IPs |
+- **SSH times out** — Security group doesn't allow port 22 from your IP, or instance in private subnet with no route
+  **Fix:** Check security group inbound rules; confirm subnet has IGW route
+- **SSH "Permission denied (publickey)"** — Wrong username for the AMI (`ec2-user` for AlmaLinux/RHEL-based, `ubuntu` for Ubuntu AMIs), or wrong key
+  **Fix:** Match username to AMI vendor; verify `.pem` file permissions (`chmod 400`)
+- **Instance launches but no public IP** — Subnet's "auto-assign public IP" disabled
+  **Fix:** Enable auto-assign public IP on the subnet, or assign an Elastic IP
+- **Unexpected charge appears** — Instance left running, or Elastic IP not associated with a running instance (charged when idle)
+  **Fix:** Terminate unused instances; release unassociated Elastic IPs
 
 ### Redaction check ✅
 

@@ -50,13 +50,11 @@ solo, "save a copy before editing" doesn't scale. Git solves:
 
 In a SysAdmin/DevOps context specifically:
 
-| Problem | Git solution |
-|---|---|
-| "Who changed the Nginx config and broke prod?" | `git log` + `git blame` |
-| "Roll back the Ansible playbook to last week's version" | `git revert` / `git checkout` |
-| "Test a risky change without breaking the live config" | Feature branch |
-| "Two engineers updating the same Terraform file" | Branching + merge/PR workflow |
-| "Prove to auditors that no one touched the firewall rules" | Immutable commit history |
+- **"Who changed the Nginx config and broke prod?"** — `git log` + `git blame`
+- **"Roll back the Ansible playbook to last week's version"** — `git revert` / `git checkout`
+- **"Test a risky change without breaking the live config"** — Feature branch
+- **"Two engineers updating the same Terraform file"** — Branching + merge/PR workflow
+- **"Prove to auditors that no one touched the firewall rules"** — Immutable commit history
 
 ### Three-Level Depth (Lens A)
 
@@ -125,13 +123,16 @@ live in Git. A SysAdmin's day looks like:
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Committing secrets (API keys, `.pem` files) | Full rotation required; history is permanent | `.gitignore` + pre-commit hooks (Gitleaks — already in this repo) |
-| Working directly on `main` | Impossible to review before it's live | Branch protection rules |
-| Giant "mega-commits" | Impossible to pinpoint what broke | Small, atomic commits |
-| Vague messages (`"fix stuff"`) | Useless history for debugging | Conventional Commits format |
-| Not pulling before branching | Merge conflicts later | Always `git pull origin main` first |
+- **Committing secrets (API keys, `.pem` files)** — Full rotation required; history is permanent
+  **Fix:** `.gitignore` + pre-commit hooks (Gitleaks — already in this repo)
+- **Working directly on `main`** — Impossible to review before it's live
+  **Fix:** Branch protection rules
+- **Giant "mega-commits"** — Impossible to pinpoint what broke
+  **Fix:** Small, atomic commits
+- **Vague messages (`"fix stuff"`)** — Useless history for debugging
+  **Fix:** Conventional Commits format
+- **Not pulling before branching** — Merge conflicts later
+  **Fix:** Always `git pull origin main` first
 
 ### When NOT to use Git (or what not to put in Git)
 
@@ -362,12 +363,14 @@ ls -la scripts/git-health-check.sh
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `git: 'pull' has no remote` | No GitHub remote configured yet | Expected — skip pull for now |
-| `Permission denied (publickey)` on push | SSH key not on GitHub | Add `~/.ssh/id_ed25519.pub` to GitHub → Settings → SSH Keys |
-| `! [rejected] main -> main (non-fast-forward)` | Remote has commits your local doesn't | `git pull --rebase origin main` then push |
-| Committed a secret by accident | **Critical** | Rotate the secret immediately. Then `git reset HEAD~1`, `.gitignore` the file, recommit. If already pushed, use `git filter-branch` or `git-filter-repo`. |
+- **`git: 'pull' has no remote`** — No GitHub remote configured yet
+  **Fix:** Expected — skip pull for now
+- **`Permission denied (publickey)` on push** — SSH key not on GitHub
+  **Fix:** Add `~/.ssh/id_ed25519.pub` to GitHub → Settings → SSH Keys
+- **`! [rejected] main -> main (non-fast-forward)`** — Remote has commits your local doesn't
+  **Fix:** `git pull --rebase origin main` then push
+- **Committed a secret by accident** — **Critical**
+  **Fix:** Rotate the secret immediately. Then `git reset HEAD~1`, `.gitignore` the file, recommit. If already pushed, use `git filter-branch` or `git-filter-repo`.
 
 ### Redaction check ✅
 

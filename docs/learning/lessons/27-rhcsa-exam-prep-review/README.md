@@ -40,12 +40,10 @@ objectives (LVM, SELinux contexts, GRUB2/boot troubleshooting, NFS) were
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "I've done 26 lessons — am I ready for RHCSA?" | This lesson's mapping table shows exactly what's covered vs. what needs dedicated practice |
-| "RHCSA is hands-on/timed — my lessons were untimed/exploratory" | Step 4's drilling exercises are timed, exam-style tasks |
-| "I never did LVM, SELinux contexts, or GRUB2 troubleshooting in depth" | Identified as gaps below — dedicated practice tasks provided |
-| "What should I review first with limited time before the exam?" | Priority ordering based on gap analysis |
+- **"I've done 26 lessons — am I ready for RHCSA?"** — This lesson's mapping table shows exactly what's covered vs. what needs dedicated practice
+- **"RHCSA is hands-on/timed — my lessons were untimed/exploratory"** — Step 4's drilling exercises are timed, exam-style tasks
+- **"I never did LVM, SELinux contexts, or GRUB2 troubleshooting in depth"** — Identified as gaps below — dedicated practice tasks provided
+- **"What should I review first with limited time before the exam?"** — Priority ordering based on gap analysis
 
 ### Three-Level Depth (Lens A)
 
@@ -138,13 +136,16 @@ transfers directly.
 
 ### Common mistakes (exam-specific)
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Not practicing on actual RHEL/AlmaLinux/Rocky (using only Ubuntu/Debian) | `dnf` vs `apt`, `firewalld` vs `ufw`, SELinux vs AppArmor — syntax differences cost time under pressure | Do Step 4's drills on AlmaLinux/Rocky specifically (free RHEL-compatible) |
-| Forgetting to make changes **persistent** (survive reboot) | A task that "works now" but doesn't survive reboot fails the exam | Always: `/etc/fstab` for mounts, `systemctl enable` for services, `nmcli con mod` (not just `ip addr add`) for network config |
-| Not verifying work before moving on | Errors compound; partial credit is limited | After each task, verify exactly as Lesson 03's "Verification" step taught — habit transfers directly |
-| Spending too long on one task | Time runs out before easier tasks are attempted | Time-box practice attempts (Step 4) — skip and return if stuck |
-| Forgetting `restorecon`/`semanage` after manually moving files (SELinux context not inherited) | Service fails with "permission denied" despite correct Unix permissions | Always check `ls -Z` after moving files into service directories |
+- **Not practicing on actual RHEL/AlmaLinux/Rocky (using only Ubuntu/Debian)** — `dnf` vs `apt`, `firewalld` vs `ufw`, SELinux vs AppArmor — syntax differences cost time under pressure
+  **Fix:** Do Step 4's drills on AlmaLinux/Rocky specifically (free RHEL-compatible)
+- **Forgetting to make changes persistent (survive reboot)** — A task that "works now" but doesn't survive reboot fails the exam
+  **Fix:** Always: `/etc/fstab` for mounts, `systemctl enable` for services, `nmcli con mod` (not just `ip addr add`) for network config
+- **Not verifying work before moving on** — Errors compound; partial credit is limited
+  **Fix:** After each task, verify exactly as Lesson 03's "Verification" step taught — habit transfers directly
+- **Spending too long on one task** — Time runs out before easier tasks are attempted
+  **Fix:** Time-box practice attempts (Step 4) — skip and return if stuck
+- **Forgetting `restorecon`/`semanage` after manually moving files (SELinux context not inherited)** — Service fails with "permission denied" despite correct Unix permissions
+  **Fix:** Always check `ls -Z` after moving files into service directories
 
 ### Interview Angle
 
@@ -278,13 +279,16 @@ systemctl --user status <generated-service>
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `lvextend`/`xfs_growfs` doesn't increase available space | Forgot `xfs_growfs` after `lvextend` (LV resize ≠ filesystem resize) | XFS filesystems must be grown separately from the LV; `xfs_growfs` is online-safe |
-| `firewall-cmd --add-service` works but doesn't survive reboot | Forgot `--permanent` flag (or forgot `--reload` after) | `--permanent` writes to config; `--reload` applies without losing runtime-only rules accidentally — both needed for "test now AND persist" |
-| `httpd` still "Forbidden" after `chcon` | `chcon` is **not persistent** across `restorecon`/relabeling | Use `semanage fcontext -a` (persistent rule) + `restorecon -Rv` (apply it) — not `chcon` alone |
-| `rd.break` recovery: `passwd` succeeds but next boot still won't let you log in | SELinux relabel not triggered — `/etc/shadow` has wrong context after `chroot` edit | `touch /.autorelabel` before exiting chroot, or run `restorecon -v /etc/shadow` |
-| NFS mount fails with "Connection refused" | `firewalld` on the NFS server doesn't allow NFS service | `firewall-cmd --add-service=nfs --permanent --add-service=rpc-bind --add-service=mountd` |
+- **`lvextend`/`xfs_growfs` doesn't increase available space** — Forgot `xfs_growfs` after `lvextend` (LV resize ≠ filesystem resize)
+  **Fix:** XFS filesystems must be grown separately from the LV; `xfs_growfs` is online-safe
+- **`firewall-cmd --add-service` works but doesn't survive reboot** — Forgot `--permanent` flag (or forgot `--reload` after)
+  **Fix:** `--permanent` writes to config; `--reload` applies without losing runtime-only rules accidentally — both needed for "test now AND persist"
+- **`httpd` still "Forbidden" after `chcon`** — `chcon` is **not persistent** across `restorecon`/relabeling
+  **Fix:** Use `semanage fcontext -a` (persistent rule) + `restorecon -Rv` (apply it) — not `chcon` alone
+- **`rd.break` recovery: `passwd` succeeds but next boot still won't let you log in** — SELinux relabel not triggered — `/etc/shadow` has wrong context after `chroot` edit
+  **Fix:** `touch /.autorelabel` before exiting chroot, or run `restorecon -v /etc/shadow`
+- **NFS mount fails with "Connection refused"** — `firewalld` on the NFS server doesn't allow NFS service
+  **Fix:** `firewall-cmd --add-service=nfs --permanent --add-service=rpc-bind --add-service=mountd`
 
 ### Redaction check ✅
 

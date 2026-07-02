@@ -37,12 +37,10 @@ alerts that fire, and the exact recovery steps, in a low-stakes setting.
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "Our monitoring/alerting has never actually been tested against a real failure" | Chaos experiment: inject a known failure, confirm detection works |
-| "Our runbook says to do X, but has anyone actually tried it?" | Follow the runbook live during the experiment — find gaps |
-| "How do I prove to an interviewer I can handle production incidents?" | A documented chaos experiment + postmortem is concrete evidence of SRE skills |
-| "Multiple lessons' tools (Prometheus, Wazuh, Traefik, CloudWatch) — do they actually work together during a real failure?" | This capstone is the integration test for your entire learning project |
+- **"Our monitoring/alerting has never actually been tested against a real failure"** — Chaos experiment: inject a known failure, confirm detection works
+- **"Our runbook says to do X, but has anyone actually tried it?"** — Follow the runbook live during the experiment — find gaps
+- **"How do I prove to an interviewer I can handle production incidents?"** — A documented chaos experiment + postmortem is concrete evidence of SRE skills
+- **"Multiple lessons' tools (Prometheus, Wazuh, Traefik, CloudWatch) — do they actually work together during a real failure?"** — This capstone is the integration test for your entire learning project
 
 ### Three-Level Depth (Lens A)
 
@@ -132,13 +130,16 @@ docker compose ps                                            # health status
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Injecting failures with no hypothesis/steady-state baseline first | Can't tell if the failure caused the observed behavior or it was already like that | Always establish "what does normal look like" before injecting |
-| Running an experiment with unbounded blast radius (e.g., on shared production with no rollback plan) | Turns a controlled experiment into a real incident | Start in your isolated lab (this capstone); production chaos engineering requires careful scoping, off-peak timing, and abort criteria |
-| Not actually following the runbook during the experiment (just "knowing" what to do) | The whole point — testing the *runbook* — is lost | Literally open `service-down.md` and follow it step by step, noting any place it's unclear/wrong |
-| Treating the capstone as "make everything green again" rather than "learn what broke and why" | Missed the actual goal — a capstone with no findings/gaps documented looks incomplete to an interviewer | The most valuable output is the **postmortem with gaps found and fixed**, not a clean run |
-| Skipping documentation because "I'll remember" | Six months later, this is your strongest portfolio piece — undocumented, it's wasted | Write it up as if a stranger (interviewer, future employer) will read it |
+- **Injecting failures with no hypothesis/steady-state baseline first** — Can't tell if the failure caused the observed behavior or it was already like that
+  **Fix:** Always establish "what does normal look like" before injecting
+- **Running an experiment with unbounded blast radius (e.g., on shared production with no rollback plan)** — Turns a controlled experiment into a real incident
+  **Fix:** Start in your isolated lab (this capstone); production chaos engineering requires careful scoping, off-peak timing, and abort criteria
+- **Not actually following the runbook during the experiment (just "knowing" what to do)** — The whole point — testing the *runbook* — is lost
+  **Fix:** Literally open `service-down.md` and follow it step by step, noting any place it's unclear/wrong
+- **Treating the capstone as "make everything green again" rather than "learn what broke and why"** — Missed the actual goal — a capstone with no findings/gaps documented looks incomplete to an interviewer
+  **Fix:** The most valuable output is the **postmortem with gaps found and fixed**, not a clean run
+- **Skipping documentation because "I'll remember"** — Six months later, this is your strongest portfolio piece — undocumented, it's wasted
+  **Fix:** Write it up as if a stranger (interviewer, future employer) will read it
 
 ### When NOT to over-engineer
 
@@ -291,13 +292,16 @@ git diff docs/runbooks/service-down.md
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `docker kill` doesn't trigger Traefik failover | Health check interval longer than your observation window, or health check endpoint doesn't reflect container death quickly | Wait the full health-check interval x retries; this itself is a finding (document the actual detection time) |
-| `fallocate` fails: "fallocate failed: Operation not supported" | Filesystem doesn't support `fallocate` (some filesystems/overlay configs) | Use `dd if=/dev/zero of=/tmp/fillfile bs=1M count=10000` instead |
-| `tc netem` commands fail: "RTNETLINK answers: Operation not permitted" | Need root/`sudo`, or `tc` not installed | `sudo tc ...`; install `iproute2` package if missing |
-| Prometheus alert doesn't fire during disk-fill experiment | `for` duration (Lesson 22) longer than your fill+observe window, or threshold not reached | Either wait longer, or temporarily lower the threshold for the experiment (revert after) |
-| Can't tell if Traefik or Docker's embedded DNS handled the failover | Both might be involved — investigate logs from both | `docker compose logs traefik` AND check DNS resolution behavior; document which mechanism you conclude was responsible |
+- **`docker kill` doesn't trigger Traefik failover** — Health check interval longer than your observation window, or health check endpoint doesn't reflect container death quickly
+  **Fix:** Wait the full health-check interval x retries; this itself is a finding (document the actual detection time)
+- **`fallocate` fails: "fallocate failed: Operation not supported"** — Filesystem doesn't support `fallocate` (some filesystems/overlay configs)
+  **Fix:** Use `dd if=/dev/zero of=/tmp/fillfile bs=1M count=10000` instead
+- **`tc netem` commands fail: "RTNETLINK answers: Operation not permitted"** — Need root/`sudo`, or `tc` not installed
+  **Fix:** `sudo tc ...`; install `iproute2` package if missing
+- **Prometheus alert doesn't fire during disk-fill experiment** — `for` duration (Lesson 22) longer than your fill+observe window, or threshold not reached
+  **Fix:** Either wait longer, or temporarily lower the threshold for the experiment (revert after)
+- **Can't tell if Traefik or Docker's embedded DNS handled the failover** — Both might be involved — investigate logs from both
+  **Fix:** `docker compose logs traefik` AND check DNS resolution behavior; document which mechanism you conclude was responsible
 
 ### Redaction check ✅
 

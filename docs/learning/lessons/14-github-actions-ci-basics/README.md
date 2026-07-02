@@ -28,12 +28,10 @@ for you, on every PR, without relying on memory or discipline.
 
 ### What problem it solves
 
-| Problem | GitHub Actions solution |
-|---|---|
-| "Did this PR break the `hardening_audit.sh` script?" | A workflow runs `bash -n` / shellcheck on every PR |
-| "Someone pushed a Dockerfile that doesn't build" | A workflow runs `docker build` on every push |
-| "We keep forgetting to run `ansible-lint` before merging" | CI runs it automatically and blocks the merge if it fails |
-| "Deploy to production only after tests pass and someone approves" | Environments with protection rules + `needs:` job dependencies |
+- **"Did this PR break the `hardening_audit.sh` script?"** — A workflow runs `bash -n` / shellcheck on every PR
+- **"Someone pushed a Dockerfile that doesn't build"** — A workflow runs `docker build` on every push
+- **"We keep forgetting to run `ansible-lint` before merging"** — CI runs it automatically and blocks the merge if it fails
+- **"Deploy to production only after tests pass and someone approves"** — Environments with protection rules + `needs:` job dependencies
 
 ### Three-Level Depth (Lens A)
 
@@ -138,13 +136,16 @@ jobs:
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Using `@main`/`@latest` for third-party actions | A supply-chain attack or breaking change in the action affects your CI without warning | Pin to a specific version tag or commit SHA |
-| No `permissions:` block | Workflow gets default (sometimes broad) permissions | Explicitly set `permissions: contents: read` (add more only as needed) |
-| Echoing secrets for "debugging" | Even masked, transformed secrets (base64, substring) can leak | Never print secrets; use `::add-mask::` if you must derive a new sensitive value |
-| Not caching dependencies | Every CI run reinstalls everything — slow, wastes runner minutes | `actions/cache` or built-in caching in `setup-*` actions |
-| One massive job instead of parallel jobs | Slow feedback — a lint failure waits behind a long build | Split into parallel jobs (`lint`, `build`, `test`) |
+- **Using `@main`/`@latest` for third-party actions** — A supply-chain attack or breaking change in the action affects your CI without warning
+  **Fix:** Pin to a specific version tag or commit SHA
+- **No `permissions:` block** — Workflow gets default (sometimes broad) permissions
+  **Fix:** Explicitly set `permissions: contents: read` (add more only as needed)
+- **Echoing secrets for "debugging"** — Even masked, transformed secrets (base64, substring) can leak
+  **Fix:** Never print secrets; use `::add-mask::` if you must derive a new sensitive value
+- **Not caching dependencies** — Every CI run reinstalls everything — slow, wastes runner minutes
+  **Fix:** `actions/cache` or built-in caching in `setup-*` actions
+- **One massive job instead of parallel jobs** — Slow feedback — a lint failure waits behind a long build
+  **Fix:** Split into parallel jobs (`lint`, `build`, `test`)
 
 ### When NOT to over-engineer CI
 
@@ -171,12 +172,10 @@ secrets. The senior framing treats third-party actions and CI permissions as
 
 ## Step 3 — Alternatives
 
-| Tool | Use case |
-|---|---|
-| **GitHub Actions** (this lesson) | Tightly integrated with GitHub repos/PRs — the most common choice for GitHub-hosted projects, and what most job postings expect |
-| **GitLab CI** | Equivalent for GitLab-hosted repos — very similar YAML concepts |
-| **Jenkins** | Self-hosted, older, highly configurable — still common in enterprises with on-prem infrastructure |
-| **CircleCI / Travis CI** | Other hosted CI platforms — less common now relative to GitHub Actions |
+- **GitHub Actions (this lesson)** — Tightly integrated with GitHub repos/PRs — the most common choice for GitHub-hosted projects, and what most job postings expect
+- **GitLab CI** — Equivalent for GitLab-hosted repos — very similar YAML concepts
+- **Jenkins** — Self-hosted, older, highly configurable — still common in enterprises with on-prem infrastructure
+- **CircleCI / Travis CI** — Other hosted CI platforms — less common now relative to GitHub Actions
 
 **For NaviOps:** GitHub Actions is the natural choice (repo is already on
 GitHub, Lesson 02) and directly demonstrable to employers via a public repo's
@@ -278,13 +277,16 @@ ansible-lint playbooks/*.yml
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| Workflow doesn't trigger at all | File not in `.github/workflows/`, or YAML syntax error | Check exact path; validate YAML (`yamllint` or GitHub's own UI will show parse errors) |
-| `actions/checkout` step needed but missing | Without it, the runner has no copy of your repo | Always include `- uses: actions/checkout@v4` as the first step |
-| Job passes locally but fails in CI | Different OS/tool versions on the runner vs. your machine | Pin tool versions explicitly (`actions/setup-python@v5` with `python-version:`) |
-| Secret not available in workflow | Secret not added in repo Settings → Secrets, or wrong scope (org vs repo vs environment) | Add the secret in the correct scope; reference as `${{ secrets.NAME }}` |
-| CI takes a long time on every run | No caching | Add `actions/cache` for dependency directories |
+- **Workflow doesn't trigger at all** — File not in `.github/workflows/`, or YAML syntax error
+  **Fix:** Check exact path; validate YAML (`yamllint` or GitHub's own UI will show parse errors)
+- **`actions/checkout` step needed but missing** — Without it, the runner has no copy of your repo
+  **Fix:** Always include `- uses: actions/checkout@v4` as the first step
+- **Job passes locally but fails in CI** — Different OS/tool versions on the runner vs. your machine
+  **Fix:** Pin tool versions explicitly (`actions/setup-python@v5` with `python-version:`)
+- **Secret not available in workflow** — Secret not added in repo Settings → Secrets, or wrong scope (org vs repo vs environment)
+  **Fix:** Add the secret in the correct scope; reference as `${{ secrets.NAME }}`
+- **CI takes a long time on every run** — No caching
+  **Fix:** Add `actions/cache` for dependency directories
 
 ### Redaction check ✅
 

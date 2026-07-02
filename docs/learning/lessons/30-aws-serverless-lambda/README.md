@@ -39,13 +39,11 @@ but Lambda manages *everything* below your function, where k8s hands you the clu
 
 ### What problem it solves
 
-| Problem | Lambda solution |
-|---|---|
-| "An EC2 box sits idle 95% of the day but I pay for all of it" | Lambda scales to zero — $0 when no events |
-| "When a user uploads to S3, resize the image" | S3 event → Lambda, no polling server |
-| "I need a small JSON API but don't want to run/patch a web server" | API Gateway → Lambda |
-| "Run a cleanup job every night" | EventBridge schedule → Lambda (serverless cron) |
-| "Traffic spikes 50× at launch and my server falls over" | Lambda scales out automatically per request |
+- **"An EC2 box sits idle 95% of the day but I pay for all of it"** — Lambda scales to zero — $0 when no events
+- **"When a user uploads to S3, resize the image"** — S3 event → Lambda, no polling server
+- **"I need a small JSON API but don't want to run/patch a web server"** — API Gateway → Lambda
+- **"Run a cleanup job every night"** — EventBridge schedule → Lambda (serverless cron)
+- **"Traffic spikes 50× at launch and my server falls over"** — Lambda scales out automatically per request
 
 ### Three-Level Depth (Lens A)
 
@@ -116,14 +114,18 @@ aws lambda update-function-configuration --function-name hello \
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Over-broad execution role (`*` actions) | A compromised function can touch your whole account; `iam:PassRole` is a top privesc path | One role **per function**, least privilege; generate it from CloudTrail with **IAM Access Analyzer** ([source](https://docs.aws.amazon.com/lambda/latest/dg/least-privilege.html)) |
-| Secrets in environment variables | Visible in console, CloudFormation, deploy logs | **Secrets Manager / SSM Parameter Store** ([source](https://tasrieit.com/blog/aws-lambda-best-practices-production-2026)) |
-| Timeout left at 900s "just in case" | Runaway/hung invocations bill the full duration | Set timeout to **p99 + 50%** from CloudWatch |
-| Function URL with `AuthType: NONE` | Wiz found thousands of internal functions exposed to the public internet | Use **`AWS_IAM`** auth (or API Gateway authorizer) |
-| Never tuning memory | Paying 50%+ too much; slow cold path | **Lambda Power Tuning** to find the cost/perf-optimal memory |
-| Heavy work in the handler body, not Init | Re-pays setup every invoke | Initialize clients/connections **outside** the handler (reused across warm calls) |
+- **Over-broad execution role (`*` actions)** — A compromised function can touch your whole account; `iam:PassRole` is a top privesc path
+  **Fix:** One role **per function**, least privilege; generate it from CloudTrail with **IAM Access Analyzer** ([source](https://docs.aws.amazon.com/lambda/latest/dg/least-privilege.html))
+- **Secrets in environment variables** — Visible in console, CloudFormation, deploy logs
+  **Fix:** **Secrets Manager / SSM Parameter Store** ([source](https://tasrieit.com/blog/aws-lambda-best-practices-production-2026))
+- **Timeout left at 900s "just in case"** — Runaway/hung invocations bill the full duration
+  **Fix:** Set timeout to **p99 + 50%** from CloudWatch
+- **Function URL with `AuthType: NONE`** — Wiz found thousands of internal functions exposed to the public internet
+  **Fix:** Use **`AWS_IAM`** auth (or API Gateway authorizer)
+- **Never tuning memory** — Paying 50%+ too much; slow cold path
+  **Fix:** **Lambda Power Tuning** to find the cost/perf-optimal memory
+- **Heavy work in the handler body, not Init** — Re-pays setup every invoke
+  **Fix:** Initialize clients/connections **outside** the handler (reused across warm calls)
 
 ### When NOT to use Lambda
 
@@ -152,15 +154,13 @@ least blast radius) and treat memory as a performance dial, not just a cost one.
 
 ## Step 3 — Alternatives
 
-| Option | Use case |
-|---|---|
-| **Lambda** (this lesson) | Event-driven, bursty, scale-to-zero; glue + small APIs + ops automation |
-| **EC2** (L16) | Long-lived, stateful, full OS control; steady high load |
-| **ECS / Fargate** | Containerized services without managing nodes; longer-running than Lambda, container-native |
-| **EKS / Kubernetes** (L29) | Portable orchestration at scale, multi-cloud; most ops overhead |
-| **Step Functions** | Orchestrate *many* Lambdas into a workflow (retries, branching, state) |
-| **App Runner / Fargate** | "Just run my container as a web service" without k8s |
-| **Azure Functions / GCP Cloud Functions** | The same FaaS model on other clouds (ties to L31 bridge) |
+- **Lambda (this lesson)** — Event-driven, bursty, scale-to-zero; glue + small APIs + ops automation
+- **EC2 (L16)** — Long-lived, stateful, full OS control; steady high load
+- **ECS / Fargate** — Containerized services without managing nodes; longer-running than Lambda, container-native
+- **EKS / Kubernetes (L29)** — Portable orchestration at scale, multi-cloud; most ops overhead
+- **Step Functions** — Orchestrate *many* Lambdas into a workflow (retries, branching, state)
+- **App Runner / Fargate** — "Just run my container as a web service" without k8s
+- **Azure Functions / GCP Cloud Functions** — The same FaaS model on other clouds (ties to L31 bridge)
 
 **For NaviOps:** Lambda is the right serverless entry — it composes with everything you've built
 (IAM L15, S3 L17, CloudWatch L18, Terraform L25). Mentally map it against L29: **Lambda = "AWS runs
@@ -267,14 +267,18 @@ aws lambda get-function --function-name hello 2>&1 | grep -q ResourceNotFound &&
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `403 {"message":"Forbidden"}` from the URL | Wrong route key / stage, or missing `aws_lambda_permission` | Check `route_key` matches `GET /hello`; ensure API Gateway has invoke permission |
-| `AccessDenied` inside the function | Execution role lacks the action/resource | Add the *specific* `Action` on the *specific* ARN to the role |
-| `502 Bad Gateway` | Handler returned a bad shape for proxy integration | Return `{statusCode, headers, body}` (body must be a string) |
-| `Task timed out after 6.00 seconds` | Real work exceeds timeout (or hung call) | Fix the slow call; raise timeout to p99+buffer — don't jump to 900 |
-| High bill / slow | Under-provisioned memory or x86 | Power-Tune memory; switch to `arm64` |
-| Cold-start latency on a user path | No warm environment | Provisioned Concurrency or SnapStart (only if it matters) |
+- **`403 {"message":"Forbidden"}` from the URL** — Wrong route key / stage, or missing `aws_lambda_permission`
+  **Fix:** Check `route_key` matches `GET /hello`; ensure API Gateway has invoke permission
+- **`AccessDenied` inside the function** — Execution role lacks the action/resource
+  **Fix:** Add the *specific* `Action` on the *specific* ARN to the role
+- **`502 Bad Gateway`** — Handler returned a bad shape for proxy integration
+  **Fix:** Return `{statusCode, headers, body}` (body must be a string)
+- **`Task timed out after 6.00 seconds`** — Real work exceeds timeout (or hung call)
+  **Fix:** Fix the slow call; raise timeout to p99+buffer — don't jump to 900
+- **High bill / slow** — Under-provisioned memory or x86
+  **Fix:** Power-Tune memory; switch to `arm64`
+- **Cold-start latency on a user path** — No warm environment
+  **Fix:** Provisioned Concurrency or SnapStart (only if it matters)
 
 ### Redaction check ✅
 

@@ -31,12 +31,10 @@ script is a piece of NaviOps' operational memory.
 
 ### What problem it solves
 
-| Problem | Bash solution |
-|---|---|
-| "Run these 8 commands every morning to check server health" | `healthcheck.sh` |
-| "Audit which users have sudo / weak permissions" | `user_audit.sh` |
-| "I always forget the exact `find` flags for old log cleanup" | `log_cleanup.sh` |
-| "New hire needs to repeat my exact diagnostic steps" | A script *is* the documentation |
+- **"Run these 8 commands every morning to check server health"** — `healthcheck.sh`
+- **"Audit which users have sudo / weak permissions"** — `user_audit.sh`
+- **"I always forget the exact `find` flags for old log cleanup"** — `log_cleanup.sh`
+- **"New hire needs to repeat my exact diagnostic steps"** — A script *is* the documentation
 
 ### Three-Level Depth (Lens A)
 
@@ -116,14 +114,18 @@ IFS=$'\n\t'
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| No `set -euo pipefail` | Script continues after a failed command, causing cascading damage | Always set it as the first line |
-| Unquoted variables (`rm $DIR/*`) | Word-splitting/globbing breaks on spaces or empty `$DIR` (`rm /*`!) | Always quote: `"$DIR"` |
-| `cd` without checking success | If `cd /backup` fails, the next `rm -rf *` runs in the **wrong directory** | `cd /backup || exit 1` |
-| Hardcoded paths/usernames | Breaks when run on a different host or by a different user | Use variables, `$(whoami)`, config files |
-| No logging | Can't debug what happened during a 3am cron failure | Timestamped log function (Step 4) |
-| Using `function foo {` | Non-portable (bashism); `foo() {` is POSIX | Use `name() { ...; }` ([bashstyle](https://gist.github.com/outro56/4a2403ae8fefdeb832a5)) |
+- **No `set -euo pipefail`** — Script continues after a failed command, causing cascading damage
+  **Fix:** Always set it as the first line
+- **Unquoted variables (`rm $DIR/*`)** — Word-splitting/globbing breaks on spaces or empty `$DIR` (`rm /*`!)
+  **Fix:** Always quote: `"$DIR"`
+- **`cd` without checking success** — If `cd /backup` fails, the next `rm -rf *` runs in the **wrong directory**
+  **Fix:** `cd /backup
+- **Hardcoded paths/usernames** — Breaks when run on a different host or by a different user
+  **Fix:** Use variables, `$(whoami)`, config files
+- **No logging** — Can't debug what happened during a 3am cron failure
+  **Fix:** Timestamped log function (Step 4)
+- **Using `function foo {`** — Non-portable (bashism); `foo() {` is POSIX
+  **Fix:** Use `name() { ...; }` ([bashstyle](https://gist.github.com/outro56/4a2403ae8fefdeb832a5))
 
 ### When NOT to use Bash
 
@@ -306,12 +308,14 @@ drwxr-x--- sys-ctl:sys-ctl /home/sys-ctl/
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `Permission denied` running `./scripts/user_audit.sh` | Not executable | `chmod +x scripts/user_audit.sh` |
-| `unbound variable` error | `set -u` caught a typo | Check variable names — this is `set -u` working as intended |
-| Script exits silently after one command fails | `set -e` working as intended | Check the failed command's exit code; add error handling if it's expected to fail sometimes |
-| `find: '/home': Permission denied` | Running as non-root, some dirs unreadable | Expected — the `2>/dev/null \|\| true` in `check_world_writable` handles this |
+- **`Permission denied` running `./scripts/user_audit.sh`** — Not executable
+  **Fix:** `chmod +x scripts/user_audit.sh`
+- **`unbound variable` error** — `set -u` caught a typo
+  **Fix:** Check variable names — this is `set -u` working as intended
+- **Script exits silently after one command fails** — `set -e` working as intended
+  **Fix:** Check the failed command's exit code; add error handling if it's expected to fail sometimes
+- **`find: '/home': Permission denied`** — Running as non-root, some dirs unreadable
+  **Fix:** Expected — the `2>/dev/null || true` in `check_world_writable` handles this
 
 ### Redaction check ✅
 

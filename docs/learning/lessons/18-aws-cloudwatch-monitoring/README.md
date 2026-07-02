@@ -30,13 +30,11 @@ app is slow."
 
 ### What problem it solves
 
-| Problem | CloudWatch solution |
-|---|---|
-| "Is this EC2 instance's CPU/disk/network healthy right now?" | CloudWatch metrics (auto-collected for EC2 by default) |
-| "Alert me if disk usage exceeds 85%" | CloudWatch alarm + SNS notification (extends Lesson 07's `disk_report.sh` threshold) |
-| "Centralize logs from multiple instances in one place" | CloudWatch Logs (via CloudWatch agent) |
-| "When CPU spikes, automatically run a remediation script" | Alarm → SSM Automation (auto-remediation) |
-| "Show me CPU/memory/disk for all my instances on one screen" | CloudWatch Dashboard |
+- **"Is this EC2 instance's CPU/disk/network healthy right now?"** — CloudWatch metrics (auto-collected for EC2 by default)
+- **"Alert me if disk usage exceeds 85%"** — CloudWatch alarm + SNS notification (extends Lesson 07's `disk_report.sh` threshold)
+- **"Centralize logs from multiple instances in one place"** — CloudWatch Logs (via CloudWatch agent)
+- **"When CPU spikes, automatically run a remediation script"** — Alarm → SSM Automation (auto-remediation)
+- **"Show me CPU/memory/disk for all my instances on one screen"** — CloudWatch Dashboard
 
 ### Three-Level Depth (Lens A)
 
@@ -143,13 +141,16 @@ aws logs tail /var/log/naviops --follow
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Setting alarm thresholds based on guesswork | Constant false alarms (alert fatigue) or alarms that never fire | Base thresholds on ~2 weeks of real metric history |
-| Single-datapoint alarms | One transient spike triggers a page at 3am for nothing | Require multiple consecutive breaching periods (`evaluation-periods`) |
-| Assuming memory/disk usage metrics exist by default | Alarms on these metrics silently never trigger (metric doesn't exist) | Install CloudWatch agent for memory/disk metrics |
-| No SNS subscription confirmed | Alarm fires but no one is notified | Confirm SNS subscription (check email/confirm link) after creating |
-| Auto-remediation for risky actions (e.g., auto-terminate) | A flapping alarm could cause a remediation loop or data loss | Reserve auto-remediation for safe, idempotent actions (restart a service); alert-only for risky ones |
+- **Setting alarm thresholds based on guesswork** — Constant false alarms (alert fatigue) or alarms that never fire
+  **Fix:** Base thresholds on ~2 weeks of real metric history
+- **Single-datapoint alarms** — One transient spike triggers a page at 3am for nothing
+  **Fix:** Require multiple consecutive breaching periods (`evaluation-periods`)
+- **Assuming memory/disk usage metrics exist by default** — Alarms on these metrics silently never trigger (metric doesn't exist)
+  **Fix:** Install CloudWatch agent for memory/disk metrics
+- **No SNS subscription confirmed** — Alarm fires but no one is notified
+  **Fix:** Confirm SNS subscription (check email/confirm link) after creating
+- **Auto-remediation for risky actions (e.g., auto-terminate)** — A flapping alarm could cause a remediation loop or data loss
+  **Fix:** Reserve auto-remediation for safe, idempotent actions (restart a service); alert-only for risky ones
 
 ### When NOT to over-engineer
 
@@ -273,12 +274,14 @@ aws cloudwatch describe-alarm-history --alarm-name naviops-high-cpu
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| Alarm never reaches ALARM state during test | `evaluation-periods`/`period` too long for a quick test, or threshold too high | Temporarily lower threshold/periods for testing, restore afterward |
-| No email received | SNS subscription not confirmed | Check spam folder; re-subscribe and confirm |
-| Disk alarm metric doesn't exist (`disk_used_percent`) | CloudWatch agent not installed/configured for disk metrics | Install and configure the CloudWatch agent with a metrics config including disk |
-| `put-metric-alarm` fails: AccessDenied | IAM permissions missing for `cloudwatch:PutMetricAlarm`/`sns:*` | Add appropriate least-privilege permissions (Lesson 15) |
+- **Alarm never reaches ALARM state during test** — `evaluation-periods`/`period` too long for a quick test, or threshold too high
+  **Fix:** Temporarily lower threshold/periods for testing, restore afterward
+- **No email received** — SNS subscription not confirmed
+  **Fix:** Check spam folder; re-subscribe and confirm
+- **Disk alarm metric doesn't exist (`disk_used_percent`)** — CloudWatch agent not installed/configured for disk metrics
+  **Fix:** Install and configure the CloudWatch agent with a metrics config including disk
+- **`put-metric-alarm` fails: AccessDenied** — IAM permissions missing for `cloudwatch:PutMetricAlarm`/`sns:*`
+  **Fix:** Add appropriate least-privilege permissions (Lesson 15)
 
 ### Redaction check ✅
 

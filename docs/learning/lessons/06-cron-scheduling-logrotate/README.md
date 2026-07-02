@@ -29,12 +29,10 @@ nothing can write, service crashes").
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "Run the backup script every night at 2am" | Crontab entry: `0 2 * * * /scripts/backup.sh` |
-| "Check disk space every 5 minutes and alert if >90%" | Cron or systemd timer + `service_check.sh` |
-| "`/var/log/myapp.log` is 40GB and growing" | logrotate config: rotate daily, keep 7, compress |
-| "I need to know exactly when a scheduled job ran and what it printed" | systemd timer + `journalctl -u myjob.service` |
+- **"Run the backup script every night at 2am"** — Crontab entry: `0 2 * * * /scripts/backup.sh`
+- **"Check disk space every 5 minutes and alert if >90%"** — Cron or systemd timer + `service_check.sh`
+- **"`/var/log/myapp.log` is 40GB and growing"** — logrotate config: rotate daily, keep 7, compress
+- **"I need to know exactly when a scheduled job ran and what it printed"** — systemd timer + `journalctl -u myjob.service`
 
 ### Three-Level Depth (Lens A)
 
@@ -106,13 +104,16 @@ logrotate -d /etc/logrotate.conf # dry-run (debug mode), shows what WOULD happen
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Relative paths / assuming `$PATH` in cron | Cron runs with a **minimal environment** — `python3: command not found` even though it works in your shell | Use absolute paths (`/usr/bin/python3`), or set `PATH=` at the top of the crontab |
-| No output redirection | Cron emails output to the user's local mailbox (often unread) — errors go unnoticed | `>> /var/log/myjob.log 2>&1` |
-| Forgetting the **user field** in `/etc/crontab`/`/etc/cron.d/` | "Job doesn't run" — syntax error (this field doesn't exist in personal `crontab -e`) | `0 2 * * * root /scripts/backup.sh` |
-| Non-idempotent jobs (Lesson 03 Q3) on a schedule | A missed/duplicate run causes drift or duplicate side effects | Design jobs to be safe to re-run |
-| logrotate without `copytruncate` or signal/postrotate, for apps that hold the file open | App keeps writing to the renamed (now-invisible) file — disk usage doesn't actually drop | Use `postrotate`/`sharedscripts` to signal the app to reopen its log, or `copytruncate` |
+- **Relative paths / assuming `$PATH` in cron** — Cron runs with a **minimal environment** — `python3: command not found` even though it works in your shell
+  **Fix:** Use absolute paths (`/usr/bin/python3`), or set `PATH=` at the top of the crontab
+- **No output redirection** — Cron emails output to the user's local mailbox (often unread) — errors go unnoticed
+  **Fix:** `>> /var/log/myjob.log 2>&1`
+- **Forgetting the user field in `/etc/crontab`/`/etc/cron.d/`** — "Job doesn't run" — syntax error (this field doesn't exist in personal `crontab -e`)
+  **Fix:** `0 2 * * * root /scripts/backup.sh`
+- **Non-idempotent jobs (Lesson 03 Q3) on a schedule** — A missed/duplicate run causes drift or duplicate side effects
+  **Fix:** Design jobs to be safe to re-run
+- **logrotate without `copytruncate` or signal/postrotate, for apps that hold the file open** — App keeps writing to the renamed (now-invisible) file — disk usage doesn't actually drop
+  **Fix:** Use `postrotate`/`sharedscripts` to signal the app to reopen its log, or `copytruncate`
 
 ### When NOT to use cron
 
@@ -141,13 +142,11 @@ treats "no output" as a debugging dead-end to eliminate first, not a mystery.
 
 ## Step 3 — Alternatives
 
-| Tool | Use case |
-|---|---|
-| **cron** (this lesson) | Simple, universal, portable across every Linux distro |
-| **systemd timers** | Better logging (journald), resource limits, `Persistent=` catch-up — increasingly preferred on systemd systems |
-| **`at`** | One-time future execution (`at 2am tomorrow`), not recurring |
-| **Ansible `cron` module** | Manage crontabs declaratively across many hosts (Lesson 13) |
-| **Cloud-native: AWS EventBridge Scheduler** | Cloud equivalent for triggering Lambda/scripts on AWS infrastructure (Lesson 15+) |
+- **cron (this lesson)** — Simple, universal, portable across every Linux distro
+- **systemd timers** — Better logging (journald), resource limits, `Persistent=` catch-up — increasingly preferred on systemd systems
+- **`at`** — One-time future execution (`at 2am tomorrow`), not recurring
+- **Ansible `cron` module** — Manage crontabs declaratively across many hosts (Lesson 13)
+- **Cloud-native: AWS EventBridge Scheduler** — Cloud equivalent for triggering Lambda/scripts on AWS infrastructure (Lesson 15+)
 
 **For NaviOps:** start with cron (simplest, you already know the syntax broadly);
 convert your most important jobs to systemd timers once Lesson 05's concepts are
@@ -268,13 +267,16 @@ journalctl -u naviops-audit.service --no-pager | tail
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| Cron job doesn't run, but works when you run it manually | `$PATH`/environment differences | Use absolute paths everywhere; add `PATH=` line at top of crontab if needed |
-| No output anywhere from a cron job | Output not redirected | Add `>> logfile 2>&1` |
-| Backup archive is 0 bytes / `tar -tzf` fails | Source path wrong, or `tar` ran before files were ready | Check `$BACKUP_SRC`, run manually with `set -x` |
-| logrotate doesn't shrink disk usage despite "rotating" | App still has old log file open (Level 3) | Add `postrotate`/`sharedscripts` to signal the app, or use `copytruncate` |
-| systemd timer never fires | Timer not `enable`d, or `OnCalendar=` syntax wrong | `systemctl list-timers`; `systemd-analyze calendar "daily"` to test syntax |
+- **Cron job doesn't run, but works when you run it manually** — `$PATH`/environment differences
+  **Fix:** Use absolute paths everywhere; add `PATH=` line at top of crontab if needed
+- **No output anywhere from a cron job** — Output not redirected
+  **Fix:** Add `>> logfile 2>&1`
+- **Backup archive is 0 bytes / `tar -tzf` fails** — Source path wrong, or `tar` ran before files were ready
+  **Fix:** Check `$BACKUP_SRC`, run manually with `set -x`
+- **logrotate doesn't shrink disk usage despite "rotating"** — App still has old log file open (Level 3)
+  **Fix:** Add `postrotate`/`sharedscripts` to signal the app, or use `copytruncate`
+- **systemd timer never fires** — Timer not `enable`d, or `OnCalendar=` syntax wrong
+  **Fix:** `systemctl list-timers`; `systemd-analyze calendar "daily"` to test syntax
 
 ### Redaction check ✅
 

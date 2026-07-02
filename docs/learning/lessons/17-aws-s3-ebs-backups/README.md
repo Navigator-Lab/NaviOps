@@ -31,13 +31,11 @@ not just files.
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "My EC2 instance was terminated and I lost everything on its disk" | EBS volume (persists independently) + snapshots |
-| "I need to store backups somewhere that survives the loss of the server itself" | S3 bucket |
-| "Old backups are piling up and costing money" | S3 Lifecycle policies (auto-transition/expire) |
-| "I accidentally overwrote/deleted an important file in S3" | S3 Versioning |
-| "Backups for compliance need to be kept 1 year but rarely accessed" | S3 Glacier (cheap, slow-retrieval archive tier) |
+- **"My EC2 instance was terminated and I lost everything on its disk"** — EBS volume (persists independently) + snapshots
+- **"I need to store backups somewhere that survives the loss of the server itself"** — S3 bucket
+- **"Old backups are piling up and costing money"** — S3 Lifecycle policies (auto-transition/expire)
+- **"I accidentally overwrote/deleted an important file in S3"** — S3 Versioning
+- **"Backups for compliance need to be kept 1 year but rarely accessed"** — S3 Glacier (cheap, slow-retrieval archive tier)
 
 ### Three-Level Depth (Lens A)
 
@@ -128,13 +126,16 @@ aws ec2 describe-snapshots --owner-ids self
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Backups stored only on the same instance/volume they back up | A single failure (instance termination, volume corruption) loses both data AND backup | Always store backups in a **different** failure domain (S3, different region for critical data) |
-| Enabling versioning without lifecycle rules for old versions | Storage costs grow unboundedly as old versions accumulate | Pair versioning with lifecycle rules expiring non-current versions after N days |
-| S3 bucket with public read access by accident | Data breach — a very common real-world incident category | Block public access at the bucket level unless explicitly required (e.g., static website hosting) |
-| Forgetting to test restoring from a backup | "We have backups" but they've never been verified to actually restore | Periodically test restore (this lesson's Step 5) |
-| Leaving unattached EBS volumes/old snapshots around | Ongoing storage charges for data nobody uses | Periodic audit (extend `hardening_audit.sh`/`disk_report.sh` patterns) |
+- **Backups stored only on the same instance/volume they back up** — A single failure (instance termination, volume corruption) loses both data AND backup
+  **Fix:** Always store backups in a **different** failure domain (S3, different region for critical data)
+- **Enabling versioning without lifecycle rules for old versions** — Storage costs grow unboundedly as old versions accumulate
+  **Fix:** Pair versioning with lifecycle rules expiring non-current versions after N days
+- **S3 bucket with public read access by accident** — Data breach — a very common real-world incident category
+  **Fix:** Block public access at the bucket level unless explicitly required (e.g., static website hosting)
+- **Forgetting to test restoring from a backup** — "We have backups" but they've never been verified to actually restore
+  **Fix:** Periodically test restore (this lesson's Step 5)
+- **Leaving unattached EBS volumes/old snapshots around** — Ongoing storage charges for data nobody uses
+  **Fix:** Periodic audit (extend `hardening_audit.sh`/`disk_report.sh` patterns)
 
 ### When NOT to over-engineer
 
@@ -257,12 +258,14 @@ tar -tzf /tmp/naviops-docs_<timestamp>.tar.gz | head
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `aws s3 mb` fails: "BucketAlreadyExists" | Bucket names are **globally unique** across all AWS accounts | Add a unique suffix (e.g., your account ID or a random string) |
-| `aws s3 cp` fails: "Access Denied" | IAM user/role lacks `s3:PutObject` permission on this bucket | Attach a policy granting `s3:PutObject`/`s3:GetObject`/`s3:ListBucket` on the specific bucket ARN (Lesson 15's least-privilege practice) |
-| Lifecycle rule doesn't seem to apply | Transitions/expirations take up to 24-48h to execute, not instant | This is expected AWS behavior — verify the *configuration* is correct, don't expect immediate object movement |
-| Snapshot stuck "pending" for a long time | Normal for large volumes (incremental after first) | Wait; `describe-snapshots` shows progress percentage |
+- **`aws s3 mb` fails: "BucketAlreadyExists"** — Bucket names are **globally unique** across all AWS accounts
+  **Fix:** Add a unique suffix (e.g., your account ID or a random string)
+- **`aws s3 cp` fails: "Access Denied"** — IAM user/role lacks `s3:PutObject` permission on this bucket
+  **Fix:** Attach a policy granting `s3:PutObject`/`s3:GetObject`/`s3:ListBucket` on the specific bucket ARN (Lesson 15's least-privilege practice)
+- **Lifecycle rule doesn't seem to apply** — Transitions/expirations take up to 24-48h to execute, not instant
+  **Fix:** This is expected AWS behavior — verify the *configuration* is correct, don't expect immediate object movement
+- **Snapshot stuck "pending" for a long time** — Normal for large volumes (incremental after first)
+  **Fix:** Wait; `describe-snapshots` shows progress percentage
 
 ### Redaction check ✅
 

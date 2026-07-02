@@ -37,13 +37,11 @@ checking (not "run AIDE when you remember").
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "Someone's brute-forcing SSH on one of my servers — how would I know?" | Wazuh HIDS rule: N failed logins in M minutes → alert |
-| "A critical config file (`/etc/passwd`, `/etc/ssh/sshd_config`) was modified — by what/whom?" | Wazuh FIM (extends Lesson 10's AIDE, continuously, with attribution) |
-| "Is any installed package on my fleet vulnerable to a known CVE?" | Wazuh vulnerability detection module |
-| "Are all my hosts still meeting the hardening baseline from Lesson 10?" | Wazuh SCA — continuous compliance checking |
-| "I have auditd logs on 5 servers — where do I even look during an incident?" | Wazuh centralizes + correlates — directly feeds Lesson 19's "Detection" stage |
+- **"Someone's brute-forcing SSH on one of my servers — how would I know?"** — Wazuh HIDS rule: N failed logins in M minutes → alert
+- **"A critical config file (`/etc/passwd`, `/etc/ssh/sshd_config`) was modified — by what/whom?"** — Wazuh FIM (extends Lesson 10's AIDE, continuously, with attribution)
+- **"Is any installed package on my fleet vulnerable to a known CVE?"** — Wazuh vulnerability detection module
+- **"Are all my hosts still meeting the hardening baseline from Lesson 10?"** — Wazuh SCA — continuous compliance checking
+- **"I have auditd logs on 5 servers — where do I even look during an incident?"** — Wazuh centralizes + correlates — directly feeds Lesson 19's "Detection" stage
 
 ### Three-Level Depth (Lens A)
 
@@ -141,13 +139,16 @@ curl -k -u <user>:<pass> "https://<MANAGER_IP>:55000/security/user/authenticate"
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Deploying Wazuh with default rules and never tuning | Alert fatigue from noisy default rules (same lesson as Lesson 18/22's alert-fatigue theme) | Tune/disable rules that don't apply to your environment; adjust thresholds |
-| FIM monitoring too broad a scope (e.g., entire `/`) | Massive alert volume, performance overhead, hard to find signal | Scope FIM to genuinely critical paths (`/etc`, `/usr/bin`, `/usr/sbin`, application configs) |
-| No one reviews the Wazuh dashboard | Same as Lesson 19 Q5's "detection without anyone watching" — alerts fire into the void | Integrate with Lesson 19's runbook — Wazuh alerts should trigger the incident-response process |
-| Treating SCA failures as "fix later" indefinitely | Hardening drifts over time; the continuous-compliance benefit is wasted | Track SCA score over time; treat regressions as action items (Lesson 19's postmortem pattern) |
-| Running Wazuh manager on the same host it's protecting | If that host is compromised, the SIEM itself is compromised | Run the manager on a separate, more tightly controlled host |
+- **Deploying Wazuh with default rules and never tuning** — Alert fatigue from noisy default rules (same lesson as Lesson 18/22's alert-fatigue theme)
+  **Fix:** Tune/disable rules that don't apply to your environment; adjust thresholds
+- **FIM monitoring too broad a scope (e.g., entire `/`)** — Massive alert volume, performance overhead, hard to find signal
+  **Fix:** Scope FIM to genuinely critical paths (`/etc`, `/usr/bin`, `/usr/sbin`, application configs)
+- **No one reviews the Wazuh dashboard** — Same as Lesson 19 Q5's "detection without anyone watching" — alerts fire into the void
+  **Fix:** Integrate with Lesson 19's runbook — Wazuh alerts should trigger the incident-response process
+- **Treating SCA failures as "fix later" indefinitely** — Hardening drifts over time; the continuous-compliance benefit is wasted
+  **Fix:** Track SCA score over time; treat regressions as action items (Lesson 19's postmortem pattern)
+- **Running Wazuh manager on the same host it's protecting** — If that host is compromised, the SIEM itself is compromised
+  **Fix:** Run the manager on a separate, more tightly controlled host
 
 ### When NOT to over-engineer
 
@@ -270,13 +271,16 @@ for i in {1..6}; do ssh wronguser@<LAB_VM_IP> "exit" 2>/dev/null; done
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| Agent shows "Disconnected" / "Never connected" | Agent not registered, or manager unreachable (firewall, Lesson 09/21) | Re-run `agent-auth`; confirm manager port (1514/1515) reachable from agent |
-| FIM alert doesn't appear after editing `/etc/hosts` | `realtime="yes"` not set, or `/etc` not in monitored `<directories>` | Confirm `ossec.conf` syscheck block, restart `wazuh-agent` |
-| Brute-force alert doesn't fire | Default ruleset threshold not reached, or SSH logs not being read by Wazuh agent (`<localfile>` config) | Confirm agent's `ossec.conf` includes the SSH/auth log source for your distro |
-| Wazuh stack won't start / out of memory | Wazuh's full stack (manager+indexer+dashboard) is resource-heavy for small lab VMs | Note this in your reflection — document the minimum viable resources you found, this is a real operational consideration |
-| Dashboard login fails | Default credentials not yet changed, or indexer not fully started (takes a few minutes) | Wait for all containers/services healthy; check default credentials per the Wazuh quickstart |
+- **Agent shows "Disconnected" / "Never connected"** — Agent not registered, or manager unreachable (firewall, Lesson 09/21)
+  **Fix:** Re-run `agent-auth`; confirm manager port (1514/1515) reachable from agent
+- **FIM alert doesn't appear after editing `/etc/hosts`** — `realtime="yes"` not set, or `/etc` not in monitored `<directories>`
+  **Fix:** Confirm `ossec.conf` syscheck block, restart `wazuh-agent`
+- **Brute-force alert doesn't fire** — Default ruleset threshold not reached, or SSH logs not being read by Wazuh agent (`<localfile>` config)
+  **Fix:** Confirm agent's `ossec.conf` includes the SSH/auth log source for your distro
+- **Wazuh stack won't start / out of memory** — Wazuh's full stack (manager+indexer+dashboard) is resource-heavy for small lab VMs
+  **Fix:** Note this in your reflection — document the minimum viable resources you found, this is a real operational consideration
+- **Dashboard login fails** — Default credentials not yet changed, or indexer not fully started (takes a few minutes)
+  **Fix:** Wait for all containers/services healthy; check default credentials per the Wazuh quickstart
 
 ### Redaction check ✅
 

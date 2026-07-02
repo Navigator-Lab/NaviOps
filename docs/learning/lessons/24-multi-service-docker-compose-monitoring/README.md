@@ -34,13 +34,11 @@ internals shouldn't be directly internet-reachable (Lesson 12's
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "I have 2 instances of my app — how do users reach 'the app' as one address?" | Reverse proxy (Traefik/Nginx) load-balancing across replicas |
-| "Only the reverse proxy should be reachable from outside; DB and app internals stay private" | Docker networks: `proxy` (external-facing) + `backend` (internal) |
-| "I want to monitor this whole stack the way I learned in Lesson 22" | Prometheus + Node Exporter + (cAdvisor for container metrics) + Grafana, as additional services in the same Compose project |
-| "One app replica crashes — does the whole stack go down?" | Reverse proxy health checks route around the unhealthy replica (Lesson 21) |
-| "How do I know this whole thing is healthy at a glance?" | One Grafana dashboard covering proxy, app replicas, db, host |
+- **"I have 2 instances of my app — how do users reach 'the app' as one address?"** — Reverse proxy (Traefik/Nginx) load-balancing across replicas
+- **"Only the reverse proxy should be reachable from outside; DB and app internals stay private"** — Docker networks: `proxy` (external-facing) + `backend` (internal)
+- **"I want to monitor this whole stack the way I learned in Lesson 22"** — Prometheus + Node Exporter + (cAdvisor for container metrics) + Grafana, as additional services in the same Compose project
+- **"One app replica crashes — does the whole stack go down?"** — Reverse proxy health checks route around the unhealthy replica (Lesson 21)
+- **"How do I know this whole thing is healthy at a glance?"** — One Grafana dashboard covering proxy, app replicas, db, host
 
 ### Three-Level Depth (Lens A)
 
@@ -136,13 +134,16 @@ docker compose up -d --scale app=3
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Publishing ports on app replicas directly (`ports: - "8081:8080"`) in addition to the proxy | Bypasses the proxy/load-balancing entirely; inconsistent access patterns | Only the proxy publishes ports to the host; app replicas reachable only via the `proxy` network |
-| No resource limits on any service | One runaway container (e.g., a memory leak, Lesson 19) starves the whole host | Set `deploy.resources.limits` per service (Lesson 11's `--memory` at Compose scale) |
-| Database on the same network as the reverse proxy | DB technically reachable from the public-facing network | Strict network segmentation: `backend` network for DB, `internal: true` (Lesson 12) |
-| Monitoring stack (Prometheus/Grafana) exposed on public ports with default credentials | Attackers can read your entire metrics history / dashboards | Proxy-route monitoring UIs behind authentication, or keep on a VPN-only network (Lesson 21) |
-| No `restart` policy | A crashed container stays down until someone notices | `restart: unless-stopped` (or `always`) on all long-running services |
+- **Publishing ports on app replicas directly (`ports: - "8081:8080"`) in addition to the proxy** — Bypasses the proxy/load-balancing entirely; inconsistent access patterns
+  **Fix:** Only the proxy publishes ports to the host; app replicas reachable only via the `proxy` network
+- **No resource limits on any service** — One runaway container (e.g., a memory leak, Lesson 19) starves the whole host
+  **Fix:** Set `deploy.resources.limits` per service (Lesson 11's `--memory` at Compose scale)
+- **Database on the same network as the reverse proxy** — DB technically reachable from the public-facing network
+  **Fix:** Strict network segmentation: `backend` network for DB, `internal: true` (Lesson 12)
+- **Monitoring stack (Prometheus/Grafana) exposed on public ports with default credentials** — Attackers can read your entire metrics history / dashboards
+  **Fix:** Proxy-route monitoring UIs behind authentication, or keep on a VPN-only network (Lesson 21)
+- **No `restart` policy** — A crashed container stays down until someone notices
+  **Fix:** `restart: unless-stopped` (or `always`) on all long-running services
 
 ### When NOT to over-engineer
 
@@ -346,13 +347,16 @@ docker compose exec traefik sh -c "wget -qO- db:5432" || echo "db unreachable fr
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| Traefik returns 404 for all requests | Missing/incorrect `traefik.http.routers.*.rule` label, or `exposedbydefault=false` with no `traefik.enable=true` label | Check labels match exactly; `docker compose logs traefik` shows discovered routers |
-| Both `app1`/`app2` always get the same share but one is unhealthy and still receives traffic | Health check misconfigured (always passes) or Traefik not configured to respect it | Verify `healthcheck` actually fails when the app is broken (test by `docker compose exec app1 pkill <process>`) |
-| `db` reachable from `proxy` network unexpectedly | `db` accidentally added to `proxy` network in `compose.yaml` | Remove `db` from any network except `backend` |
-| Grafana via Traefik shows blank/broken UI | Grafana needs `GF_SERVER_ROOT_URL` set when served under a subpath (`/grafana`) | Set `GF_SERVER_ROOT_URL=http://<host>/grafana` and `GF_SERVER_SERVE_FROM_SUB_PATH=true` |
-| cAdvisor container fails to start / permission errors | cAdvisor needs read access to `/sys`, `/var/lib/docker`, etc. | Confirm volume mounts match the sketch exactly; cAdvisor has known quirks on some host OSes — document if you hit this |
+- **Traefik returns 404 for all requests** — Missing/incorrect `traefik.http.routers.*.rule` label, or `exposedbydefault=false` with no `traefik.enable=true` label
+  **Fix:** Check labels match exactly; `docker compose logs traefik` shows discovered routers
+- **Both `app1`/`app2` always get the same share but one is unhealthy and still receives traffic** — Health check misconfigured (always passes) or Traefik not configured to respect it
+  **Fix:** Verify `healthcheck` actually fails when the app is broken (test by `docker compose exec app1 pkill <process>`)
+- **`db` reachable from `proxy` network unexpectedly** — `db` accidentally added to `proxy` network in `compose.yaml`
+  **Fix:** Remove `db` from any network except `backend`
+- **Grafana via Traefik shows blank/broken UI** — Grafana needs `GF_SERVER_ROOT_URL` set when served under a subpath (`/grafana`)
+  **Fix:** Set `GF_SERVER_ROOT_URL=http://<host>/grafana` and `GF_SERVER_SERVE_FROM_SUB_PATH=true`
+- **cAdvisor container fails to start / permission errors** — cAdvisor needs read access to `/sys`, `/var/lib/docker`, etc.
+  **Fix:** Confirm volume mounts match the sketch exactly; cAdvisor has known quirks on some host OSes — document if you hit this
 
 ### Redaction check ✅
 

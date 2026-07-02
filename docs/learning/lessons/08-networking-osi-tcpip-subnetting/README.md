@@ -31,12 +31,10 @@ and groups devices logically (e.g., "servers" vs "workstations" vs "guest Wi-Fi"
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "Is this a cabling issue, a routing issue, or an application bug?" | OSI layers give you a systematic place to start (Layer 1 → Layer 7) |
-| "I have 192.168.1.0/24 — how do I split it for 4 departments?" | Subnetting math (Step 4) |
-| "What's my server's IP, and is it listening on port 443?" | `ip addr`, `ss -tlnp` |
-| "Two hosts on the same subnet can talk; different subnets can't, without a router" | Understanding network/host portions of an address |
+- **"Is this a cabling issue, a routing issue, or an application bug?"** — OSI layers give you a systematic place to start (Layer 1 → Layer 7)
+- **"I have 192.168.1.0/24 — how do I split it for 4 departments?"** — Subnetting math (Step 4)
+- **"What's my server's IP, and is it listening on port 443?"** — `ip addr`, `ss -tlnp`
+- **"Two hosts on the same subnet can talk; different subnets can't, without a router"** — Understanding network/host portions of an address
 
 ### Three-Level Depth (Lens A)
 
@@ -115,12 +113,14 @@ traceroute <ip>             # which hops/routers does traffic pass through?
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Confusing IP address with subnet mask role | Misconfigured static IPs that can't reach the gateway | Remember: mask defines network/host **split**, not a separate address |
-| Forgetting network (`.0`) and broadcast (`.255`) addresses aren't usable hosts | Off-by-one errors when planning host counts | Usable hosts = 2^(32-prefix) − 2 |
-| Troubleshooting "top-down" (jumping straight to "is the website broken?") | Wastes time — the issue might be L1/L2/L3 | Troubleshoot **bottom-up** (Level 2) |
-| Using `ifconfig`/`netstat` (deprecated) | Often not installed by default on modern distros | Use `ip` and `ss` (the `iproute2` suite) |
+- **Confusing IP address with subnet mask role** — Misconfigured static IPs that can't reach the gateway
+  **Fix:** Remember: mask defines network/host **split**, not a separate address
+- **Forgetting network (`.0`) and broadcast (`.255`) addresses aren't usable hosts** — Off-by-one errors when planning host counts
+  **Fix:** Usable hosts = 2^(32-prefix) − 2
+- **Troubleshooting "top-down" (jumping straight to "is the website broken?")** — Wastes time — the issue might be L1/L2/L3
+  **Fix:** Troubleshoot **bottom-up** (Level 2)
+- **Using `ifconfig`/`netstat` (deprecated)** — Often not installed by default on modern distros
+  **Fix:** Use `ip` and `ss` (the `iproute2` suite)
 
 ### When NOT to over-engineer subnetting
 
@@ -234,12 +234,14 @@ ip link show && ip addr show && ip route show && ss -tlnp
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `ip`/`ss` not found | Minimal container/image without `iproute2` | `apt install iproute2` / `dnf install iproute` |
-| `ping` to gateway fails but internet works | Asymmetric routing or `ping` blocked by firewall on the gateway itself | Try `ip route get <internet-ip>` to see which route is actually used |
-| Subnet math doesn't match the Python check | Arithmetic error in manual calc — common spot: forgetting to subtract 2 for usable hosts, or miscounting host bits | Recompute: host bits = 32 − prefix; total = 2^host bits |
-| `ss -tlnp` requires `sudo` to show process names | Permission — only your own processes' names show without root | `sudo ss -tlnp` for full visibility |
+- **`ip`/`ss` not found** — Minimal container/image without `iproute2`
+  **Fix:** `apt install iproute2` / `dnf install iproute`
+- **`ping` to gateway fails but internet works** — Asymmetric routing or `ping` blocked by firewall on the gateway itself
+  **Fix:** Try `ip route get <internet-ip>` to see which route is actually used
+- **Subnet math doesn't match the Python check** — Arithmetic error in manual calc — common spot: forgetting to subtract 2 for usable hosts, or miscounting host bits
+  **Fix:** Recompute: host bits = 32 − prefix; total = 2^host bits
+- **`ss -tlnp` requires `sudo` to show process names** — Permission — only your own processes' names show without root
+  **Fix:** `sudo ss -tlnp` for full visibility
 
 ### Redaction check ✅
 

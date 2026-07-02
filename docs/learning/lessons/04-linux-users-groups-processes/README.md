@@ -28,12 +28,10 @@ boundary between "my web server" and "your database."
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| New employee needs an account with specific group access | `useradd` + `usermod -aG` |
-| A runaway process is consuming 100% CPU | `ps`/`top` to find it, `kill`/`nice` to manage it |
-| "Which service is this process, and who started it?" | `ps -ef`, `/proc/<pid>/` |
-| Service accounts shouldn't allow interactive login | `useradd -s /usr/sbin/nologin` |
+- **New employee needs an account with specific group access** — `useradd` + `usermod -aG`
+- **A runaway process is consuming 100% CPU** — `ps`/`top` to find it, `kill`/`nice` to manage it
+- **"Which service is this process, and who started it?"** — `ps -ef`, `/proc/<pid>/`
+- **Service accounts shouldn't allow interactive login** — `useradd -s /usr/sbin/nologin`
 
 ### Three-Level Depth (Lens A)
 
@@ -111,13 +109,16 @@ kill -9 <pid>     # SIGKILL — force, only if SIGTERM didn't work
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| `usermod -G docker user` (no `-a`) | **Removes** the user from every other group — silent privilege loss | Always `usermod -aG` |
-| `useradd` without `-m` | No home directory created — login/SSH config issues | `useradd -m` |
-| Service accounts with `/bin/bash` shell | Unnecessary attack surface (someone can `su` into it and get a shell) | `-s /usr/sbin/nologin` |
-| Reaching for `kill -9` first | Process can't clean up — corrupted temp files, locked DB rows, orphaned children | Try `kill` (SIGTERM) first, wait, then `-9` |
-| Editing `/etc/passwd`/`/etc/shadow` directly | Syntax errors can lock out **all** logins | Use `usermod`/`vipw` (which locks the file properly) |
+- **`usermod -G docker user` (no `-a`)** — **Removes** the user from every other group — silent privilege loss
+  **Fix:** Always `usermod -aG`
+- **`useradd` without `-m`** — No home directory created — login/SSH config issues
+  **Fix:** `useradd -m`
+- **Service accounts with `/bin/bash` shell** — Unnecessary attack surface (someone can `su` into it and get a shell)
+  **Fix:** `-s /usr/sbin/nologin`
+- **Reaching for `kill -9` first** — Process can't clean up — corrupted temp files, locked DB rows, orphaned children
+  **Fix:** Try `kill` (SIGTERM) first, wait, then `-9`
+- **Editing `/etc/passwd`/`/etc/shadow` directly** — Syntax errors can lock out **all** logins
+  **Fix:** Use `usermod`/`vipw` (which locks the file properly)
 
 ### When NOT to
 
@@ -148,21 +149,17 @@ going forward, not just patches this one instance.
 
 ### User/group management alternatives
 
-| Tool | Use case |
-|---|---|
-| `useradd`/`usermod`/`groupadd` (this lesson) | Direct, scriptable, works everywhere |
-| `adduser` (Debian/Ubuntu wrapper) | Friendlier interactive prompts, but a wrapper — `useradd` is the portable underlying tool |
-| **Ansible `user`/`group` modules** | Declarative, idempotent — define desired state once, apply to many hosts (Lesson 13) |
-| **LDAP/Active Directory + SSSD** | Centralized identity for many machines — beyond a single-host scope but standard in enterprises |
+- **`useradd`/`usermod`/`groupadd` (this lesson)** — Direct, scriptable, works everywhere
+- **`adduser` (Debian/Ubuntu wrapper)** — Friendlier interactive prompts, but a wrapper — `useradd` is the portable underlying tool
+- **Ansible `user`/`group` modules** — Declarative, idempotent — define desired state once, apply to many hosts (Lesson 13)
+- **LDAP/Active Directory + SSSD** — Centralized identity for many machines — beyond a single-host scope but standard in enterprises
 
 ### Process management alternatives
 
-| Tool | Use case |
-|---|---|
-| `ps`, `kill` (this lesson) | Universal, scriptable |
-| `top`/`htop` | Interactive live monitoring (`htop` — nicer UI, not always preinstalled) |
-| `pgrep`/`pkill` | Find/signal processes **by name** instead of PID — `pkill -f myapp` |
-| `systemctl` (Lesson 05) | For services managed by systemd — `systemctl restart` is preferred over manually killing+restarting a service's process |
+- **`ps`, `kill` (this lesson)** — Universal, scriptable
+- **`top`/`htop`** — Interactive live monitoring (`htop` — nicer UI, not always preinstalled)
+- **`pgrep`/`pkill`** — Find/signal processes **by name** instead of PID — `pkill -f myapp`
+- **`systemctl` (Lesson 05)** — For services managed by systemd — `systemctl restart` is preferred over manually killing+restarting a service's process
 
 **For NaviOps:** use `useradd`/`usermod` directly for now (single-host); Ansible
 (Lesson 13) becomes the right tool once managing more than one machine.
@@ -266,12 +263,14 @@ bash -n scripts/user_audit.sh
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `usermod: group 'docker' does not exist` | Group not created yet | `groupadd docker` first, or install Docker (creates it) |
-| New user can't log in via SSH | Shell set to `/usr/sbin/nologin` or home dir missing | Check `/etc/passwd` entry; recreate with `-m -s /bin/bash` |
-| `userdel: user testuser is currently used by process X` | A process (e.g., a leftover shell) is still running as that user | `pkill -u testuser` first, then `userdel` |
-| Zombie processes never go away | Parent process itself is stuck/buggy | Restart or kill the **parent** — killing the zombie itself does nothing (it's already dead) |
+- **`usermod: group 'docker' does not exist`** — Group not created yet
+  **Fix:** `groupadd docker` first, or install Docker (creates it)
+- **New user can't log in via SSH** — Shell set to `/usr/sbin/nologin` or home dir missing
+  **Fix:** Check `/etc/passwd` entry; recreate with `-m -s /bin/bash`
+- **`userdel: user testuser is currently used by process X`** — A process (e.g., a leftover shell) is still running as that user
+  **Fix:** `pkill -u testuser` first, then `userdel`
+- **Zombie processes never go away** — Parent process itself is stuck/buggy
+  **Fix:** Restart or kill the **parent** — killing the zombie itself does nothing (it's already dead)
 
 ### Redaction check ✅
 

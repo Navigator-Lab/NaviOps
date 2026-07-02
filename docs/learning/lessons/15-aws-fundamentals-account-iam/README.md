@@ -30,13 +30,11 @@ using it for daily work.
 
 ### What problem it solves
 
-| Problem | Solution |
-|---|---|
-| "I need a server for testing but don't want to buy hardware" | EC2 (Lesson 16) |
-| "My laptop's lab VM needs to be reachable when I'm not home" | Cloud-hosted VM |
-| "Anyone who has my AWS password can do ANYTHING, including delete everything and rack up charges" | IAM users with **least privilege**, never use root day-to-day |
-| "I accidentally left a resource running and got a surprise bill" | Billing alerts + AWS Budgets + Free Tier alerts |
-| "An EC2 instance needs to read from an S3 bucket — without hardcoding credentials" | IAM **roles** (temporary credentials, no stored keys) |
+- **"I need a server for testing but don't want to buy hardware"** — EC2 (Lesson 16)
+- **"My laptop's lab VM needs to be reachable when I'm not home"** — Cloud-hosted VM
+- **"Anyone who has my AWS password can do ANYTHING, including delete everything and rack up charges"** — IAM users with **least privilege**, never use root day-to-day
+- **"I accidentally left a resource running and got a surprise bill"** — Billing alerts + AWS Budgets + Free Tier alerts
+- **"An EC2 instance needs to read from an S3 bucket — without hardcoding credentials"** — IAM **roles** (temporary credentials, no stored keys)
 
 ### Three-Level Depth (Lens A)
 
@@ -119,13 +117,16 @@ aws budgets describe-budgets --account-id <ACCOUNT_ID>
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Using the root account for daily work | If credentials leak, attacker has **total** account control | Create an IAM user/role for yourself immediately; lock root away with MFA |
-| Attaching `AdministratorAccess` "to make it work" | Massive blast radius if that user/role/key is compromised | Start with minimal policy, add specific permissions as needed (least privilege) |
-| Hardcoding access keys in code/scripts | Keys leaked via git (a very common real breach pattern) | Use IAM roles for AWS resources; for local dev, use `aws configure` (stored outside repo) |
-| Not setting up billing alerts before creating any resources | Forgotten resources accumulate charges silently | Step 4 — set this up **first**, before Lesson 16 |
-| No MFA on root/IAM users | Password-only access to a cloud account controlling real money | Enable MFA on root immediately, and on IAM users with console access |
+- **Using the root account for daily work** — If credentials leak, attacker has **total** account control
+  **Fix:** Create an IAM user/role for yourself immediately; lock root away with MFA
+- **Attaching `AdministratorAccess` "to make it work"** — Massive blast radius if that user/role/key is compromised
+  **Fix:** Start with minimal policy, add specific permissions as needed (least privilege)
+- **Hardcoding access keys in code/scripts** — Keys leaked via git (a very common real breach pattern)
+  **Fix:** Use IAM roles for AWS resources; for local dev, use `aws configure` (stored outside repo)
+- **Not setting up billing alerts before creating any resources** — Forgotten resources accumulate charges silently
+  **Fix:** Step 4 — set this up **first**, before Lesson 16
+- **No MFA on root/IAM users** — Password-only access to a cloud account controlling real money
+  **Fix:** Enable MFA on root immediately, and on IAM users with console access
 
 ### When NOT to over-provision IAM
 
@@ -222,12 +223,14 @@ aws budgets describe-budgets --account-id <ACCOUNT_ID>
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `aws sts get-caller-identity` returns root ARN | Still using root credentials | Switch to your IAM user's credentials (`aws configure` with the IAM user's keys) |
-| `aws` CLI: "Unable to locate credentials" | `aws configure` not run, or wrong profile | `aws configure` (or `aws configure --profile <name>` and `--profile` flag on commands) |
-| Budget alert email not received | Alert threshold not yet crossed (expected — this is a safety net, not a confirmation test) | Verify the budget exists in the console; the test is "it exists," not "it fired" |
-| IAM policy JSON has a typo and won't save | JSON syntax error | Use the AWS console's policy visual editor to generate valid JSON, then inspect it |
+- **`aws sts get-caller-identity` returns root ARN** — Still using root credentials
+  **Fix:** Switch to your IAM user's credentials (`aws configure` with the IAM user's keys)
+- **`aws` CLI: "Unable to locate credentials"** — `aws configure` not run, or wrong profile
+  **Fix:** `aws configure` (or `aws configure --profile <name>` and `--profile` flag on commands)
+- **Budget alert email not received** — Alert threshold not yet crossed (expected — this is a safety net, not a confirmation test)
+  **Fix:** Verify the budget exists in the console; the test is "it exists," not "it fired"
+- **IAM policy JSON has a typo and won't save** — JSON syntax error
+  **Fix:** Use the AWS console's policy visual editor to generate valid JSON, then inspect it
 
 ### Redaction check ✅
 

@@ -30,12 +30,10 @@ identically across any number of servers.
 
 ### What problem it solves
 
-| Problem | Ansible solution |
-|---|---|
-| "Apply the Lesson 10 hardening checklist to 50 servers" | One playbook, run against an inventory of 50 hosts |
-| "Server #23 has a different `sshd_config` than the others — why?" | Configuration as code — drift becomes visible (diff against playbook) |
-| "Re-running my setup script breaks things the second time" | Ansible modules are **idempotent** — safe to run repeatedly |
-| "New server provisioning takes a day of manual steps" | `ansible-playbook site.yml -l newserver` |
+- **"Apply the Lesson 10 hardening checklist to 50 servers"** — One playbook, run against an inventory of 50 hosts
+- **"Server #23 has a different `sshd_config` than the others — why?"** — Configuration as code — drift becomes visible (diff against playbook)
+- **"Re-running my setup script breaks things the second time"** — Ansible modules are **idempotent** — safe to run repeatedly
+- **"New server provisioning takes a day of manual steps"** — `ansible-playbook site.yml -l newserver`
 
 ### Three-Level Depth (Lens A)
 
@@ -123,13 +121,16 @@ ansible-vault encrypt group_vars/all/secrets.yml            # encrypt secrets
 
 ### Common mistakes
 
-| Mistake | Impact | Fix |
-|---|---|---|
-| Using `command`/`shell` modules for everything | Not idempotent — every run shows `changed`, breaks `--check` mode, harder to reason about | Use proper modules (`apt`, `copy`, `lineinfile`, `service`, etc.) — `ansible-lint` flags this |
-| Hardcoding secrets in playbooks | Secrets in git history forever | `ansible-vault` from day one |
-| No `--check`/`--diff` before running on production | Surprise changes across the whole fleet | Always dry-run first, especially for new/edited playbooks |
-| One giant playbook with no roles | Unmaintainable, not reusable | Break into roles by concern (hardening, webserver, monitoring) |
-| Missing task `name:` fields | Output is unreadable (`TASK [shell]` instead of `TASK [Install nginx]`), `ansible-lint` flags it | Always name tasks descriptively |
+- **Using `command`/`shell` modules for everything** — Not idempotent — every run shows `changed`, breaks `--check` mode, harder to reason about
+  **Fix:** Use proper modules (`apt`, `copy`, `lineinfile`, `service`, etc.) — `ansible-lint` flags this
+- **Hardcoding secrets in playbooks** — Secrets in git history forever
+  **Fix:** `ansible-vault` from day one
+- **No `--check`/`--diff` before running on production** — Surprise changes across the whole fleet
+  **Fix:** Always dry-run first, especially for new/edited playbooks
+- **One giant playbook with no roles** — Unmaintainable, not reusable
+  **Fix:** Break into roles by concern (hardening, webserver, monitoring)
+- **Missing task `name:` fields** — Output is unreadable (`TASK [shell]` instead of `TASK [Install nginx]`), `ansible-lint` flags it
+  **Fix:** Always name tasks descriptively
 
 ### When NOT to use Ansible
 
@@ -159,12 +160,10 @@ on a re-run," not "did the command succeed."
 
 ## Step 3 — Alternatives
 
-| Tool | Use case |
-|---|---|
-| **Ansible** (this lesson) | Agentless, YAML, huge module library, gentle learning curve — most common entry point for SysAdmin automation |
-| **Puppet / Chef** | Agent-based, more mature in some enterprises, steeper learning curve (Ruby DSL) |
-| **Terraform** (Lesson 20) | **Provisions infrastructure** (creates the VM/server itself); Ansible **configures** what's already provisioned — often used together (Terraform creates, Ansible configures) |
-| **Shell scripts** (Lessons 03-10) | Fine for single-host, one-off tasks; don't scale to fleets and aren't idempotent by default |
+- **Ansible (this lesson)** — Agentless, YAML, huge module library, gentle learning curve — most common entry point for SysAdmin automation
+- **Puppet / Chef** — Agent-based, more mature in some enterprises, steeper learning curve (Ruby DSL)
+- **Terraform (Lesson 20)** — **Provisions infrastructure** (creates the VM/server itself); Ansible **configures** what's already provisioned — often used together (Terraform creates, Ansible configures)
+- **Shell scripts (Lessons 03-10)** — Fine for single-host, one-off tasks; don't scale to fleets and aren't idempotent by default
 
 ---
 
@@ -278,13 +277,16 @@ idempotency proof.
 
 ### Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `ansible ... -m ping` fails: "UNREACHABLE" | SSH key/connectivity issue | Test `ssh` manually first (Lesson 07); check `ansible_user`/`ansible_host` |
-| "python: command not found" on target | Minimal OS image without Python | `ansible_python_interpreter=/usr/bin/python3` in inventory, or install Python first via `raw` module |
-| `become` fails with permission error | User doesn't have passwordless sudo | Configure `sudoers` for the Ansible user, or use `--ask-become-pass` |
-| Second run still shows `changed` | A task uses `command`/`shell` (not idempotent), or `lineinfile` regex doesn't match existing line | Use proper modules; test `regexp` carefully |
-| `ansible-lint` errors about missing `name:` | Style/best-practice violation | Add descriptive `name:` to every task |
+- **`ansible ... -m ping` fails: "UNREACHABLE"** — SSH key/connectivity issue
+  **Fix:** Test `ssh` manually first (Lesson 07); check `ansible_user`/`ansible_host`
+- **"python: command not found" on target** — Minimal OS image without Python
+  **Fix:** `ansible_python_interpreter=/usr/bin/python3` in inventory, or install Python first via `raw` module
+- **`become` fails with permission error** — User doesn't have passwordless sudo
+  **Fix:** Configure `sudoers` for the Ansible user, or use `--ask-become-pass`
+- **Second run still shows `changed`** — A task uses `command`/`shell` (not idempotent), or `lineinfile` regex doesn't match existing line
+  **Fix:** Use proper modules; test `regexp` carefully
+- **`ansible-lint` errors about missing `name:`** — Style/best-practice violation
+  **Fix:** Add descriptive `name:` to every task
 
 ### Redaction check ✅
 
